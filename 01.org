@@ -1547,7 +1547,7 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 3-8:* 使用 if 语句替换代码清单 15(chap03/list0315.c) 中的条件运算，实现同样的功能。
++ *ex 3-8:* 使用 if 语句替换 list 3-15(chap03/list0315.c) 中的条件运算，实现同样的功能。
   #+attr_html: :width 238px
   [[file:images/10315.png]]
 #+begin_src C
@@ -1818,7 +1818,7 @@ int main (void)
 }
 #+end_src
 *** 选择语句
-+ *ex 3-12:* 对代码清单 3-4(chap03/list0304.c) 中的程序进行修改，不使用 if 语句，而是改用 switch 语句来实现。
++ *ex 3-12:* 对 list 3-4(chap03/list0304.c) 中的程序进行修改，不使用 if 语句，而是改用 switch 语句来实现。
   (输入的整数是奇数还是偶数)
   #+attr_html: :width 238px
   [[file:images/10304.png]]
@@ -1844,7 +1844,7 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 3-13:* 对代码清单 3-17(chap03/list0317.c) 中的程序进行修改，不使用 if 语句，而是改用 switch 语句来实现。
++ *ex 3-13:* 对 list 3-17(chap03/list0317.c) 中的程序进行修改，不使用 if 语句，而是改用 switch 语句来实现。
   (显示所输入的月份所处的季节)
   #+attr_html: :width 238px
   [[file:images/10319.png]]
@@ -2065,14 +2065,14 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 4-1:* 代码清单 3-9(chap03/list0309.c) 是判断所输入的整数值的符号的程序，请将其改写为可以将输入显示这一过程循环任意次。
++ *ex 4-1:* list 3-9(chap03/list0309.c) 是判断所输入的整数值的符号的程序，请将其改写为可以将输入显示这一过程循环任意次。
   (判断输入的整数的符号)
   #+attr_html: :width 330px
   [[file:images/10404.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0401.c
-// Description : 代码清单 3-9(chap03/list0309.c) 是判断所输入的整数值的符号的程序，
+// Description : list 3-9(chap03/list0309.c) 是判断所输入的整数值的符号的程序，
 //               请将其改写为可以将输入显示这一过程循环任意次。
 //               (判断输入的整数的符号)
 
@@ -2197,13 +2197,13 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 4-3:* 对代码清单 4-5(chap04/list0405.c) 中的程序进行修改，当输入的值为负数的时候不执行换行操作。
++ *ex 4-3:* 对 list 4-5(chap04/list0405.c) 中的程序进行修改，当输入的值为负数的时候不执行换行操作。
   #+attr_html: :width 238px
   [[file:images/10408.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0403.c
-// Description : 对代码清单 4-5(chap04/list0405.c) 中的程序进行修改，当输入的值为负数的时候不执行换行操作。
+// Description : 对 list 4-5(chap04/list0405.c) 中的程序进行修改，当输入的值为负数的时候不执行换行操作。
 
 #include <stdio.h>
 
@@ -2253,13 +2253,13 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 4-4:* 对代码清单 4-6(chap04/list0406.c) 进行修改，使其：递减到 1 而非递减到 0，当输入的值小于 0 时，不进行换行。
++ *ex 4-4:* 对 list 4-6(chap04/list0406.c) 进行修改，使其：递减到 1 而非递减到 0，当输入的值小于 0 时，不进行换行。
   #+attr_html: :width 238px
   [[file:images/10410.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0404.c
-// Description : 对代码清单 4-6(chap04/list0406.c) 进行修改，使其：递减到 1 而非递减到 0，当输入的值小于 0 时，不进行换行。
+// Description : 对 list 4-6(chap04/list0406.c) 进行修改，使其：递减到 1 而非递减到 0，当输入的值小于 0 时，不进行换行。
 
 #include <stdio.h>
 
@@ -2309,13 +2309,13 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 4-5:* 对代码清单 4-7(chap04/list0407.c) 的程序进行如下修改：从 1 开始递增，输入的值小于 0 的时候不换行。
++ *ex 4-5:* 对 list 4-7(chap04/list0407.c) 的程序进行如下修改：从 1 开始递增，输入的值小于 0 的时候不换行。
   #+attr_html: :width 238px
   [[file:images/10412.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0405.c
-// Description : 对代码清单 4-7(chap04/list0407.c) 的程序进行如下修改：从 1 开始递增，输入的值小于 0 的时候不换行。
+// Description : 对 list 4-7(chap04/list0407.c) 的程序进行如下修改：从 1 开始递增，输入的值小于 0 的时候不换行。
 
 #include <stdio.h>
 
@@ -2421,13 +2421,13 @@ int main (void)
 }
 #+end_src
 *** do 语句和 while 语句
-+ *ex 4-8:* 改写代码清单 4-8(输入一个整数，连续显示出该整数个 *) 当输入的值小于 1 时不输出换行符。
++ *ex 4-8:* 改写 list 4-8(输入一个整数，连续显示出该整数个 *) 当输入的值小于 1 时不输出换行符。
   #+attr_html: :width 238px
   [[file:images/10416.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0408.c
-// Description : 改写代码清单 4-8(输入一个整数，连续显示出该整数个 *) 当输入的值小于 1 时不输出换行符。
+// Description : 改写 list 4-8(输入一个整数，连续显示出该整数个 *) 当输入的值小于 1 时不输出换行符。
 
 #include <stdio.h>
 
@@ -2573,13 +2573,13 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 4-11:* 对代码清单 4-10(chap04/list0410) 的程序进行修改，使其像下图这样在显示结果的同时显示输入的整数值。
++ *ex 4-11:* 对 list 4-10(chap04/list0410) 的程序进行修改，使其像下图这样在显示结果的同时显示输入的整数值。
   #+attr_html: :width 238px
   [[file:images/10421.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0411.c
-// Description : 对代码清单 4-10(chap04/list0410) 的程序进行修改，使其像下图这样在显示结果的同时显示输入的整数值。
+// Description : 对 list 4-10(chap04/list0410) 的程序进行修改，使其像下图这样在显示结果的同时显示输入的整数值。
 
 #include <stdio.h>
 
@@ -2606,14 +2606,14 @@ int main (void)
 }
 #+end_src
 + *ex 4-12:* 编写一段程序，读取一个正整数，显示其位数。
-  注意：代码清单 4-10(chap04/list0410.c) 中 while 语句的循环次数和 no 的位数一致。
+  注意：list 4-10(chap04/list0410.c) 中 while 语句的循环次数和 no 的位数一致。
   #+attr_html: :width 238px
   [[file:images/10422.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0412.c
 // Description : 编写一段程序，读取一个正整数，显示其位数。
-//               注意：代码清单 4-10(chap04/list0410.c) 中 while 语句的循环次数和 no 的位数一致。
+//               注意：list 4-10(chap04/list0410.c) 中 while 语句的循环次数和 no 的位数一致。
 
 #include <stdio.h>
 
@@ -2932,14 +2932,14 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 4-19:* 编写一段程序，对代码清单 4-15(chap04/list0415.c) 进行修改，
++ *ex 4-19:* 编写一段程序，对 list 4-15(chap04/list0415.c) 进行修改，
   在显示所输入的整数值的所有约数之后，显示约数的个数。
   #+attr_html: :width 238px
   [[file:images/10434.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0419.c
-// Description : 编写一段程序，对代码清单 4-15(chap04/list0415.c) 进行修改，
+// Description : 编写一段程序，对 list 4-15(chap04/list0415.c) 进行修改，
 //               在显示所输入的整数值的所有约数之后，显示约数的个数。
 
 #include <stdio.h>
@@ -3087,17 +3087,17 @@ int main (void)
 {
   int retry;
 
-  do {                          // do 语句的结构和代码清单 4-1(chap04/list0401.c) 相同
+  do {                          // do 语句的结构和 list 4-1(chap04/list0401.c) 相同
     int i, no;
 
-    do {                        // 和代码清单 4-10(chap04/list0410.c) 相同
+    do {                        // 和 list 4-10(chap04/list0410.c) 相同
       printf("请输入一个正整数：");
       scanf("%d", &no);
       if (no <= 0)
         puts("\a请不要输入非正整数！");
     } while (no <= 0);
 
-    for (i=1; i<=no; i++)       // 和代码清单 4-12(chap04/list0412.c) 相同
+    for (i=1; i<=no; i++)       // 和 list 4-12(chap04/list0412.c) 相同
       putchar('*');
     putchar('\n');
 
@@ -3172,14 +3172,14 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 4-22:* 对代码清单 4-17(chap04/list0417.c) 中的程序进行修改，显示出一个横向较长的长方形。
++ *ex 4-22:* 对 list 4-17(chap04/list0417.c) 中的程序进行修改，显示出一个横向较长的长方形。
   （读取两个边的边长，以较小的数作为行数，以较大的数作为列数。）
   #+attr_html: :width 238px
   [[file:images/10442.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0422.c
-// Description : 对代码清单 4-17(chap04/list0417.c) 中的程序进行修改，显示出一个横向较长的长方形。
+// Description : 对 list 4-17(chap04/list0417.c) 中的程序进行修改，显示出一个横向较长的长方形。
 //               （读取两个边的边长，以较小的数作为行数，以较大的数作为列数。）
 
 #include <stdio.h>
@@ -3207,14 +3207,14 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *ex 4-23:* 对代码清单 4-18(chap04/list0418.c) 和代码清单 4-19(chap04/list0419.c) 中的程序进行修改，
++ *ex 4-23:* 对 list 4-18(chap04/list0418.c) 和 list 4-19(chap04/list0419.c) 中的程序进行修改，
   分别显示出直角在左上方和右上方的等腰直角三角形（生成两个程序）
   #+attr_html: :width 238px
   [[file:images/10443.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap04/ex0423.c
-// Description : 对代码清单 4-18(chap04/list0418.c) 和代码清单 4-19(chap04/list0419.c) 中的程序进行修改，
+// Description : 对 list 4-18(chap04/list0418.c) 和 list 4-19(chap04/list0419.c) 中的程序进行修改，
 //               分别显示出直角在左上方和右上方的等腰直角三角形（生成两个程序）
 
 #include <stdio.h>
