@@ -9051,3 +9051,770 @@ int main (void)
   return 0;
 }
 #+end_src
+* 第 11 章：字符串和指针
+** 11-1: 字符串和指针
+*** 用数组实现的字符串和用指针实现的字符串
++ *list 11-1:* 用数组实现的字符串和用指针实现的字符串
+  #+attr_html: :width 238px
+  [[file:images/11101.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/list1101.c
+// Description : 用数组实现的字符串和用指针实现的字符串
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  char str[] = "ABC";            // 用数组实现的字符串
+  char *ptr  = "123";            // 用指针实现的字符串
+
+  printf("str = \"%s\"\n", str); // str 是指向第一个字符的指针
+  printf("ptr = \"%s\"\n", ptr); // ptr 是指向第一个字符的指针
+
+  return 0;
+}
+#+end_src
+*** 用数组实现的字符串和用指针实现的字符串的不同点
++ *list 11-2:* 用数组实现的字符串的改写（误例）
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1102.c
+// Description : 用数组实现的字符串的改写（误例）
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  char s[] = "ABC";
+  printf("s = \"%s\"\n", s);
+  s = "DEF";                    // 编译报错
+  printf("s = \"%s\"\n", s);
+
+  return 0;
+}
+#+end_src
++ *list 11-3:* 用指针实现字符串的改写
+  #+attr_html: :width 238px
+  [[file:images/11102.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1103.c
+// Description : 用指针实现字符串的改写
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  char *p = "123";
+  printf("p = \"%s\"\n", p);
+  p = "456";
+  printf("p = \"%s\"\n", p);
+
+  return 0;
+}
+#+end_src
++ *ex 11-1:*  将 list 11-3(chap11/list1103.c) 中对 p 的赋值进行如下修改：
+  'p = "456" + 1;'
+  #+attr_html: :width 238px
+  [[file:images/11103.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/ex1101.c
+// Description : 将 list 11-3(chap11/list1103.c) 中对 p 的赋值进行如下修改：
+//               'p = "456" + 1;'
+
+// 编译时会报 warning
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  char *p = "123";
+  printf("p = \"%s\"\n", p);
+  p = "456" + 1;
+  printf("p = \"%s\"\n", p);
+
+  return 0;
+}
+#+end_src
+*** 字符串数组
++ *list 11-4:* 字符串数组
+  #+attr_html: :width 238px
+  [[file:images/11104.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1104.c
+// Description : 字符串数组
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int i;
+  char a[][5] = {"LISP", "C", "Ada"}; // 因为有三个初始值，所以元素个数为 3
+  char *p[]   = {"PAUL", "X", "MAC"};
+
+  for (i = 0; i < 3; i++)
+    printf("a[%d] = \"%s\"\n", i, a[i]);
+
+  for (i = 0; i < 3; i++)
+    printf("p[%d] = \"%s\"\n", i, p[i]);
+
+  return 0;
+}
+#+end_src
++ *ex 11-2:* 在 list 11-4(chap11/list1104.c) 中，各数组的字符串个数 3 是作为常量嵌在程序（for 语句的控制表达式）中的。
+  编写一段程序，将其改写为通过计算求出。
+  #+attr_html: :width 238px
+  [[file:images/11105.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/ex1104.c
+// Description : 在 list 11-4(chap11/list1104.c) 中，各数组的字符串个数 3 是作为常量嵌在程序（for 语句的控制表达式）中的。
+//               编写一段程序，将其改写为通过计算求出。
+
+// 相关内容查看 images 文件夹下的 001.png 和 002.png
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int i;
+  char a[][5] = {"LISP", "C", "Ada"};
+  char *p[]   = {"PAUL", "X", "MAC"};
+
+  // sizeof(a) 是所有元素所占用的内存大小（字节）
+  // sizeof(*a) 是每一行占用内存的大小（字节）
+  for (i = 0; i < sizeof(a) / sizeof(*a); i++) {
+    // printf("%ld\n", sizeof(a));
+    // printf("%ld\n", sizeof(*a));
+    printf("a[%d] = \"%s\"\n", i, a[i]);
+  }
+
+  // sizeof(p) 是所有指针占用的内存大小（字节）
+  // sizeof(*p) 是每个指针占用的内存大小（64 位系统一般为 8）（字节）
+  for (i = 0; i< sizeof(p) / sizeof(*p); i++) {
+    // printf("%ld\n", sizeof(p));
+    // printf("%ld\n", sizeof(*p));
+    printf("p[%d] = \"%s\"\n", i, p[i]);
+  }
+
+  return 0;
+}
+#+end_src
+** 11-2: 通过指针操作字符串
+*** 判断字符串长度
++ *list 11-5:* 判断字符串的长度（使用指针遍历）
+  #+attr_html: :width 238px
+  [[file:images/11106.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1105.c
+// Description : 判断字符串的长度（使用指针遍历）
+
+#include <stdio.h>
+
+// 返回字符串 s 的长度
+int str_length (const char *s)
+{
+  int len = 0;
+
+  while (*s++)
+    len++;
+  return len;
+}
+
+int main (void)
+{
+
+  char str[128];
+
+  printf("请输入字符串：");
+  scanf("%s", str);
+
+  printf("字符串 \"%s\" 的长度是 %d\n", str, str_length(str));
+  //                                     ^---------------^--- &str[0]
+  return 0;
+}
+#+end_src
+*** 字符的复制
++ *list 11-6:* 复制字符串
+  #+attr_html: :width 238px
+  [[file:images/11107.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1106.c
+// Description : 复制字符串
+
+#include <stdio.h>
+
+// 将字符串 s 复制到 d
+char* str_copy (char *d, const char *s)
+{
+  char *t = d;
+  while (*d++ = *s++)           // clang 编译报 warning
+    ;
+  return t;
+}
+
+int main (void)
+{
+
+  char str[128] = "ABC";
+  char tmp[128];
+
+  printf("str = \"%s\"\n", str);
+
+  printf("复制的是：", tmp);    // clnag 编译报 wanging
+  scanf("%s", tmp);
+
+  str_copy(str, tmp);
+
+  puts("复制完成。");
+  printf("str = \"%s\"\n", str);
+
+  return 0;
+}
+#+end_src
+*** 不正确的字符串复制
++ *list 11-7:* 复制字符串（误例）
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1107.c
+// Description : 复制字符串（误例）
+
+// 编译时报两个 waning，运行报错
+
+#include <stdio.h>
+
+// 将字符串 s 复制到 d
+char *str_copy (char *d, const char *s)
+{
+  char *t = d;
+  while (*d++ = *s++)
+    ;
+  return t;
+}
+
+int main (void)
+{
+
+  char *ptr = "1234";
+  char tmp[128];
+
+  printf("ptr = \"%s\"\n", ptr);
+
+  printf("复制的是：", tmp);
+  scanf("%s", tmp);
+
+  str_copy(ptr, tmp);           // 将 tmp 赋值到 ptr
+
+  puts("复制完成。");
+  printf("ptr = \"%s\"\n", ptr); // 显示复制后的 ptr
+
+  return 0;
+}
+#+end_src
+*** 返回指针的函数
++ *ex 11-3:* 改写 list 11-6(chap11/list1106.c) 的程序，将 str_copy 函数的调用作为 printf 函数的实参。
+  #+attr_html: :width 238px
+  [[file:images/11106.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/ex1106.c
+// Description : 改写 list 11-6(chap11/list1106.c) 的程序，将 str_copy 函数的调用作为 printf 函数的实参。
+
+#include <stdio.h>
+
+// 将字符串 s 复制到 d
+char* str_copy (char *d, const char *s)
+{
+  char *t = d;
+  while (*d++ = *s++)           // clang 编译报 warning
+    ;
+  return t;
+}
+
+int main (void)
+{
+
+  char str[128] = "ABC";
+  char tmp[128];
+
+  printf("str = \"%s\"\n", str);
+
+  printf("复制的是：", tmp);    // clang 编译报 warning
+  scanf("%s", tmp);
+
+  printf("str = \"%s\"\n", str_copy(str, tmp));
+
+  return 0;
+}
+#+end_src
+** 11-3 字符串处理库函数
+*** strlen 函数：求字符串的长度
++ *list 11-8:* 返回字符串 s 的长度
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1108.c
+// Description : 返回字符串 s 的长度
+
+size_t strlen(const char *s)
+{
+  size_t len = 0;
+  while (*s++)
+    len++;
+  return len;
+}
+#+end_src
+*** strcpy 函数、strncpy 函数：复制字符串
++ *list 11-9:* strcpy 和 strncpy 复制字符串
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1109.c
+// Description : strcpy 和 strncpy 复制字符串
+
+// 使用 strcpy 函数的例子
+char *strcpy (char *s1, const char *s2)
+{
+  char *tmp = s1;
+  while (*s1++ = *s2++)
+    ;
+  return tmp;
+}
+
+// 使用 strncpy 函数的例子
+char *strncpy (char *s1, const char *s2, size_t n)
+{
+  char *tmp = s1;
+  while (n) {
+    if (!(*s1++ = *s2++)) break; // 遇到 '\n' 就结束循环
+    n--;
+  }
+  while (n--)
+    ,*s1++ = '\0';               // 用 '\0' 填充剩余部分
+  return tmp;
+}
+#+end_src
+*** strcat 函数、strncat 函数：连接字符串
++ *list 11-10:* stract 和 strncat 函数
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1110.c
+// Description : stract 和 strncat 函数
+
+// 使用 strcat 函数的例子
+char *strcat (char *s1, const char *s2)
+{
+  char *tmp = s1;
+
+  while (*s1)
+    s1++;                        // 前进到 s1 的末尾处
+  while (*s1++ = *s2++)
+    ;                            // 循环复制直到遇到 s2 中的 '\0'
+  return tmp;
+}
+
+// 使用 strncat 函数的例子
+char *strncat (char *s1, const char *s2, size_t n)
+{
+  char *tmp = s1;
+
+  while (*s1)
+    s1++;                        // 前进到 s1 的末尾处
+  while (n--)
+    if (!(*s1++ = *s2++)) break; // 遇到 '\0' 就结束循环
+  ,*s1 = '\0';
+  return tmp;
+}
+#+end_src
+*** strcmp 函数、strncmp 函数：比较字符串的大小关系
++ *list 11-11:* strcmp 和 strncmp 函数
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1111.c
+// Description : strcmp 和 strncmp 函数
+
+// 使用 strcmp 函数的例子
+int strcmp (const char *s1, const char *s2)
+{
+  while (*s1 == *s2) {
+    if (*s1 == '\0')
+      return 0;                 // 相等
+    s1++;
+    s2++;
+  }
+  return (unsigned char)*s1 - (unsigned char)*s2;
+}
+
+// 使用 strncmp 函数的例子
+int strncmp (const char *s1, const char *s2, size_t n)
+{
+  while (n && *s1 && *s2) {
+    if (*s1 != *s2)             // 不相等
+      return (unsigned char)*s1 - (unsigned char)*s2;
+    s1++;
+    s2++;
+    n--;
+  }
+  if (!n)  return 0;            // 相等
+  if (*s1) return 1;            // s1 > s2
+
+  return -1;                    // s1 < s2
+}
+#+end_src
+*** atoi 函数、atol 函数、atof 函数：转换字符串
++ *list 11-12:* atoi、atol、atof 函数
+  #+attr_html: :width 238px
+  [[file:images/11108.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/list1112.c
+// Description : atoi、atol、atom 函数
+
+// 使用 atoi 函数的例子
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  char str[128];
+
+  printf("请输入字符串：");
+  scanf("%s", str);
+
+  printf("转换为整数后为 %d\n", atoi(str));
+
+  return 0;
+}
+#+end_src
++ *ex 11-7:* 不使用下标运算符，实现 list 9-11(chap9/list0911.c) 的 str_toupper 函数和 str_tolower 函数。
+  #+attr_html: :width 238px
+  [[file:images/11109.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/ex1107.c
+// Description : 不使用下标运算符，实现 list 9-11(chap9/list0911.c) 的 str_toupper 函数和 str_tolower 函数。
+
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+
+// 将字符串中的英文字符转为大写字符
+void str_toupper (char *s)
+{
+  int i;
+  for (i = 0; i < strlen(s); i++)
+    ,*(s + i) = toupper(*(s + i));
+}
+
+// 将字符串中的英文字符转为小写字符
+void str_tolower (char *s)
+{
+  int i;
+  for (i = 0; i < strlen(s); i++)
+    ,*(s + i) = tolower(*(s + i));
+}
+
+int main (void)
+{
+  char str[128];
+
+  printf("请输入字符串：");
+  scanf("%s", str);
+
+  str_toupper(str);
+  printf("转换为大写：%s\n", str);
+
+  str_tolower(str);
+  printf("转换为小写：%s\n", str);
+
+  return 0;
+}
+#+end_src
++ *ex 11-8:* 编写如下程序，删除字符串 str 内所有数字字符。
+  'void del_digit (char *str) {}'
+  例如，如果接收 "AB1C9"，就返回 "ABC"。注意不要使用下标运算符。
+  #+attr_html: :width 238px
+  [[file:images/10919.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/ex1108.c
+// Description : 编写如下程序，删除字符串 str 内所有数字字符。
+//               'void del_digit (char *str) {}'
+//               例如，如果接收 "AB1C9"，就返回 "ABC"。注意不要使用下标运算符。
+
+#include <stdio.h>
+#include <string.h>
+
+// 删除字符串 str 中所有的数字字符
+void del_digit (char *str)
+{
+  int i, j;
+
+  for (i = 0; i < strlen(str); i++) {
+    if (*(str + i) >= '0' && *(str + i) <= '9') {
+      for (j = i; j < strlen(str); j++)
+        ,*(str + j) = *(str + j + 1);
+      i--;
+    }
+  }
+}
+
+int main (void)
+{
+
+  char str[128];
+
+  printf("请输入字符串：");
+  scanf("%s", str);
+
+  del_digit(str);
+
+  printf("删除所有数字后的字符串：\"%s\"\n", str);
+
+  return 0;
+}
+#+end_src
++ *ex 11-9:* 使用本节学习的函数库（strlen 函数、strcpy 函数、strncpy 函数、strcat 函数、
+  strncat 函数、strcmp 函数、strncmp 函数）编写程序。
+  #+attr_html: :width 258px
+  [[file:images/11110.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/ex1109.c
+// Description :  使用本节学习的函数库（strlen 函数、strcpy 函数、strncpy 函数、strcat 函数、
+//                strncat 函数、strcmp 函数、strncmp 函数）编写程序。
+
+#include <stdio.h>
+#include <string.h>
+
+int main (void)
+{
+
+  char s1[128] = "abcde";
+  char s2[128] = "12345";
+  char s3[128] = "ABCDE";
+  char t1[128];
+
+  puts("各字符串初始值：");
+  printf("s1: %s\n", s1);
+  printf("s2: %s\n", s2);
+  printf("s3: %s\n", s3);
+  printf("t1: %s\n", t1);
+  puts("----------------------------");
+  puts("<--- strlen 函数 --->");
+  printf("strlen (s1) : %ld\n", strlen(s1));
+
+  puts("<--- strcpy 函数 --->");
+  printf("strcpy (t1, s1) : %s\n", strcpy(t1, s1));
+  printf("s1: %s\n", s1);
+  printf("t1: %s\n", t1);
+
+  puts("<--- strncpy 函数 --->");
+  printf("strncpy (t1, s2, 3) : %s\n", strncpy(t1, s2, 3));
+  printf("s2: %s\n", s2);
+  printf("t1: %s\n", t1);
+
+  puts("<--- strcat 函数 --->");
+  printf("strcat (t1, s2) : %s\n", strcat(t1, s2));
+  printf("s2: %s\n", s2);
+  printf("t1: %s\n", t1);
+
+  puts("<--- strncat 函数 --->");
+  printf("strncat (t1, s1, 3) : %s\n", strncat(t1, s1, 3));
+  printf("s1: %s\n", s1);
+  printf("t1: %s\n", t1);
+
+  puts("<--- strcmp 函数 --->");
+  printf("strcmp (s1, t1) : %d\n", strcmp(s1, t1));
+  printf("strcmp (t1, s1) : %d\n", strcmp(t1, s1));
+  printf("s1: %s\n", s1);
+  printf("t1: %s\n", t1);
+
+  puts("<--- strncmp 函数 --->");
+  printf("strncmp (s1, s3, 3) : %d\n", strncmp(s1, s3, 3));
+  printf("strncmp (s3, s1, 3) : %d\n", strncmp(s3, s1, 3));
+  printf("s1: %s\n", s1);
+  printf("s3: %s\n", s3);
+
+  return 0;
+}
+#+end_src
++ *ex 11-10:* 编写如下函数，实现与库函数 atoi、atol、atof 相同的功能。
+  'int strtoix (const char *nptr) {}'
+  'long strtolx (const char *nptr) {}'
+  'double strtofx (const char *nptr) {}'
+  #+attr_html: :width 238px
+  [[file:images/11111.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/ex1110.c
+// Description : 编写如下函数，实现与库函数 atoi、atol、atof 相同的功能。
+//               'int strtoix (const char *nptr) {}'
+//               'long strtolx (const char *nptr) {}'
+//               'double strtof (const char *nptr) {}'
+
+// 函数写的很不全面，例如没考虑正负号、英文字符、其他字符等等，不过思路是这个思路
+
+#include <stdio.h>
+
+// 字符串转换为 int
+int strtoix (const char *nptr)
+{
+  int i = 0;
+
+  while (*nptr) {
+    i += *nptr -'0';
+    nptr++;
+    if (*nptr == '\0')
+      break;
+    i *= 10;
+  }
+  return i;
+}
+
+// 字符串转换为 long
+long strtolx (const char *nptr)
+{
+  long l = 0;
+
+  while (*nptr) {
+    l += *nptr -'0';
+    nptr++;
+    if (*nptr == '\0')
+      break;
+    l *= 10;
+  }
+  return l;
+}
+
+// 字符串转换为 double
+double strtodx (const char *nptr)
+{
+  double d = 0.0;
+  while (*nptr) {
+    d += *nptr - '0';
+    nptr++;
+    if (*nptr == '\0' || *nptr == '.')
+      break;
+    d *= 10;
+  }
+  if (*nptr == '.') {
+    nptr++;
+    double dx = 1;
+    while (*nptr) {
+      d += (*nptr - '0') / (dx *= 10);
+      nptr++;
+      if (*nptr == '0')
+        break;
+    }
+  }
+  return d;
+}
+
+int main (void)
+{
+  char si[128] = "123";
+  char sl[128] = "123";
+  char sd[128] = "1.23";
+
+  int    i = 0;
+  long   l = 0;
+  double d = 0.0;
+
+  puts("调用函数前各值：");
+  printf("字符串 si : \"%s\"\n", si);
+  printf("字符串 sl : \"%s\"\n", sl);
+  printf("字符串 sd : \"%s\"\n", sd);
+  printf("int    i : %d\n", i);
+  printf("long   l : %ld\n", l);
+  printf("double d : %lf\n",d);
+
+  i = strtoix(si);
+  l = strtolx(sl);
+  d = strtodx(sd);
+
+  puts("调用函数后各值：");
+  printf("字符串 si : \"%s\"\n", si);
+  printf("字符串 sl : \"%s\"\n", sl);
+  printf("字符串 sd : \"%s\"\n", sd);
+  printf("int    i : %d\n", i);
+  printf("long   l : %ld\n", l);
+  printf("double d : %lf\n",d);
+
+  return 0;
+}
+#+end_src
+** 总结
++ *总结：* 字符串和字符串数组
+  #+attr_html: :width 238px
+  [[file:images/11112.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap11/summary.c
+// Description : 字符串和字符串数组
+
+#include <stdio.h>
+#include <ctype.h>
+
+// 用 "" 将字符串 s 括起来显示并换行
+#define put_str_ln(s) (put_str(s), putchar('\n'))
+
+// 用 "" 将字符串 s 括起来显示
+void put_str (const char *s)
+{
+  putchar('\"');
+  while (*s)
+    putchar(*s++);
+  putchar('\"');
+}
+
+// 将字符串转换为大写并复制
+char *str_cpy_toupper (char *d, const char *s)
+{
+  char *tmp = d;
+  while ((*d++ = toupper(*s++)))
+    ;
+  return tmp;
+}
+
+int main (void)
+{
+
+  int   i;
+  char  s[128], t[128];                // 用数组实现的字符串
+  char a[]     = "CIA";                // 用数组实现的字符串
+  char *p      = "FBI";                // 用指针实现的字符串
+  char a2[][5] = {"LISP", "C", "Ada"}; // 用数组实现的字符串数组
+  char *p2[]   = {"PAUL", "X", "MAC"}; // 用指针实现的字符串数组
+
+  printf("字符串 s = ");  scanf("%s", s);
+  printf("转换为大写并复制到数组 t：\n");
+  printf("字符串 t = %s\n", str_cpy_toupper(t, s));
+
+  printf("a = ");  put_str_ln(a);
+  printf("p = ");  put_str_ln(p);
+
+  for (i = 0; i < sizeof(a2) / sizeof(a2[0]); i++) {
+    printf("a2[%d] = ", i);
+    put_str_ln(a2[i]);
+  }
+
+  for (i = 0; i < sizeof(p2) / sizeof(p2[0]); i++) {
+    printf("p2[%d] = ", i);
+    put_str_ln(p2[i]);
+  }
+
+  return 0;
+}
+#+end_src
