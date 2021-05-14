@@ -9818,3 +9818,825 @@ int main (void)
   return 0;
 }
 #+end_src
+* 第 12 章：结构体
+** 12-1: 结构体
+*** 数据关联性
++ *list 12-1:* 对 5 名学生的 “姓名和身高” 按身高进行升序排序
+  #+attr_html: :width 238px
+  [[file:images/11201.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/list1201.c
+// Description : 对 5 名学生的 “姓名和身高” 按身高进行升序排序
+
+#include <stdio.h>
+#include <string.h>
+
+#define NUMBER   5              // 学生人数
+#define NAME_LEN 64             // 姓名的字符数
+
+// 交换 x 和 y 指向的整数值
+void swap_int (int *x, int *y)
+{
+  int tmp = *x;
+  ,*x = *y;
+  ,*y = tmp;
+}
+
+// 交换 sx 和 xy 指向的字符串
+void swap_str (char *sx, char *sy)
+{
+  char tmp[NAME_LEN];
+  strcpy(tmp, sx);
+  strcpy(sx, sy);
+  strcpy(sy, tmp);
+}
+
+// 基于 num 对数组 num 和 str 的前 n 个元素进行升序排序
+void sort (int num[], char str[][NAME_LEN], int n)
+{
+  int i, j;
+  for (i = 0; i < n-1; i++) {
+    for (j = 0; j < n-i-1; j++) {
+      if (num[j] > num[j+1]) {
+        swap_int(&num[j], &num[j+1]);
+        swap_str(str[j], str[j+1]);
+      }
+    }
+  }
+}
+
+int main (void)
+{
+
+  int i;
+  int height[] = {178, 175, 173, 165, 179};
+  char name[][NAME_LEN] = {"Sato", "Sanaka", "Takao", "Mike", "Masaki"};
+
+  puts("排序前：");
+  for (i = 0; i < NUMBER; i++)
+    printf("%2d : %-8s%4d\n", i + 1, name[i], height[i]);
+
+  sort(height, name, NUMBER);   // 按照身高由低到高的顺序排列身高和姓名
+
+  puts("排序后：");
+  for (i = 0; i < NUMBER; i++)
+    printf("%2d : %-8s%4d\n", i + 1, name[i], height[i]);
+
+
+  return 0;
+}
+#+end_src
+*** 结构体成员和 . 运算
++ *list 12-2:* 用表示学生的结构体来显示佐中的信息
+  #+attr_html: :width 238px
+  [[file:images/11202.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/list1202.c
+// Description : 用表示学生的结构体来显示佐中的信息
+
+#include <stdio.h>
+#include <string.h>
+
+#define NAME_LEN 64             // 姓名的字符数
+
+// 表示学生的结构体
+struct student {
+  char  name[NAME_LEN];         // 姓名
+  int   height;                 // 身高
+  float weight;                 // 体重
+  long  schols;                 // 奖学金
+};
+
+int main (void)
+{
+
+  struct student sanaka;
+
+  strcpy(sanaka.name, "Sanaka"); // 姓名
+  sanaka.height = 175;            // 身高
+  sanaka.weight = 62.5;           // 体重
+  sanaka.schols = 7300;           // 奖学金
+
+  printf("姓名   ：%s\n"  , sanaka.name);
+  printf("身高   ：%d\n"  , sanaka.height);
+  printf("体重   ：%.1f\n", sanaka.weight);
+  printf("奖学金 ：%ld\n" , sanaka.schols);
+
+  return 0;
+}
+#+end_src
+*** 成员的初始化
++ *list 12-3:* 用表示学生的结构体来显示高尾的信息
+  #+attr_html: :width 238px
+  [[file:images/11203.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/list1203.c
+// Description : 用表示学生的结构体来显示高尾的信息
+
+#include <stdio.h>
+#include <string.h>
+
+#define NAME_LEN 64             // 姓名的字符数
+
+// 表示学生的结构体
+struct student {
+  char  name[NAME_LEN];         // 姓名
+  int   height;                 // 身高
+  float weight;                 // 体重
+  long  schols;                 // 奖学金
+};
+
+int main (void)
+{
+
+  struct student takao = {"Takao", 173, 86.2};
+
+  printf("姓名   ：%s\n"  , takao.name);
+  printf("身高   ：%d\n"  , takao.height);
+  printf("体重   ：%.1f\n", takao.weight);
+  printf("奖学金 ：%ld\n" , takao.schols);
+
+  return 0;
+}
+#+end_src
++ *ex 12-1:* 在 list 12-3(chap12/1203.c) 的基础上，编写显示对象 takao 各成员地址的程序。
+  #+attr_html: :width 272px
+  [[file:images/11204.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/ex1201.c
+// Description : 在 list 12-3(chap12/1203.c) 的基础上，编写显示对象 takao 各成员地址的程序。
+
+#include <stdio.h>
+#include <string.h>
+
+#define NAME_LEN 64             // 姓名的字符数
+
+// 表示学生的结构体
+struct student {
+  char  name[NAME_LEN];         // 姓名
+  int   height;                 // 身高
+  float weight;                 // 体重
+  long  schols;                 // 奖学金
+};
+
+int main (void)
+{
+
+  struct student takao = {"Takao", 173, 86.2};
+
+  printf("姓名   ：%s\t 地址：%p\n"  , takao.name  , &takao.name);
+  printf("身高   ：%d\t 地址：%p\n"  , takao.height, &takao.height);
+  printf("体重   ：%.1f\t 地址：%p\n", takao.weight, &takao.weight);
+  printf("奖学金 ：%ld\t 地址：%p\n" , takao.schols, &takao.schols);
+
+  return 0;
+}
+#+end_src
+*** 结构体成员和 -> 运算符
++ *list 12-4:* 拥有超能力的洋子
+  #+attr_html: :width 238px
+  [[file:images/11205.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/list1204.c
+// Description : 拥有超能力的洋子
+
+#include <stdio.h>
+
+#define NAME_LEN 64             // 姓名的字符数
+
+// 表示学生的结构体
+struct student {
+  char  name[NAME_LEN];         // 姓名
+  int   height;                 // 身高
+  float weight;                 // 体重
+  long  schols;                 // 奖学金
+};
+
+// 将 std 指向的学生的身高变为 180，体重变为 80
+void hiroko (struct student *std)
+{
+  if ((*std).height < 180)
+    (*std).height = 180;
+  if ((*std).weight > 80)
+    (*std).weight = 80;
+  // 或者使用 -> 运算符（推荐使用）
+  // if (std->height < 180)
+  //   std->height = 180;
+  // if (std->weight > 80)
+  //   std->weight = 80;
+}
+
+int main (void)
+{
+
+  struct student sanaka = {"Sanaka", 175, 62.5, 73000};
+
+  hiroko(&sanaka);
+
+  printf("姓  名 = %s\n"   , sanaka.name);
+  printf("身  高 = %d\n"   , sanaka.height);
+  printf("体  重 = %.1f\n" , sanaka.weight);
+  printf("奖学金 = %ld\n"  , sanaka.schols);
+
+  return 0;
+}
+#+end_src
+*** 结构体和 typedef
++ *list 12-5:* 拥有超能力的洋子（在结构体中引入 typedef 名）
+  #+attr_html: :width 238px
+  [[file:images/11206.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/list1205.c
+// Description : 拥有超能力的洋子（在结构体中引入 typedef 名）
+
+#include <stdio.h>
+
+#define NAME_LEN 64             // 姓名的字符数
+
+// 表示学生的结构体
+typedef struct student {
+  char name[NAME_LEN];          // 姓名
+  int height;                   // 身高
+  float weight;                 // 体重
+  long schols;                  // 奖学金
+} Student;
+
+// 将 std 指向的学生的身高变为 180，体重变为 80
+void hiroko (Student *std)
+{
+  if (std->height < 180)
+    std->height = 180;
+  if (std->weight > 80)
+    std->weight = 80;
+}
+
+int main (void)
+{
+
+  Student sanaka = {"Sanaka", 175, 62.5, 3000};
+
+  hiroko(&sanaka);
+
+  printf("姓  名 = %s\n"   , sanaka.name);
+  printf("身  高 = %d\n"   , sanaka.height);
+  printf("体  重 = %.1f\n" , sanaka.weight);
+  printf("奖学金 = %ld\n"  , sanaka.schols);
+
+  return 0;
+}
+#+end_src
+*** 返回结构体的函数
++ *list 12-6:* 返回结构体的函数
+  #+attr_html: :width 238px
+  [[file:images/11207.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/list1206.c
+// Description : 返回结构体的函数
+
+#include <stdio.h>
+
+// xyz 结构体
+struct xyz {
+  int    x;
+  long   y;
+  double z;
+};
+
+// 返回具有 (x, y, z) 的值的结构体 xyz
+struct xyz xyz_of (int x, long y, double z)
+{
+  struct xyz tmp;
+
+  tmp.x = x;
+  tmp.y = y;
+  tmp.z = z;
+  return tmp;                   // 原样返回结构体
+}
+
+int main (void)
+{
+
+  struct xyz s = {0, 0, 0};
+
+  s = xyz_of(12, 7654321, 35.689);
+
+  printf("xyz.x = %d\n"  , s.x);
+  printf("xyz.y = %ld\n" , s.y);
+  printf("xyz.z = %f\n"  , s.z);
+
+  return 0;
+}
+#+end_src
++ *ex 12-2:* list 12-5(chap12/list1205.c) 的程序中，结构体对象 sanaka 的各成员的值都有初始值。
+  改写这个程序，声明时不为其赋初始值，而且各成员的值从键盘键入。
+  #+attr_html: :width 280px
+  [[file:images/11208.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/ex1205.c
+// Description : list 12-5(chap12/list1205.c) 的程序中，结构体对象 sanaka 的各成员的值都有初始值。
+//               改写这个程序，声明时不为其赋初始值，而且各成员的值从键盘键入。
+
+#include <stdio.h>
+
+#define NAME_LEN 64             // 姓名的字符数
+
+// 表示学生的结构体
+typedef struct student {
+  char name[NAME_LEN];          // 姓名
+  int height;                   // 身高
+  float weight;                 // 体重
+  long schols;                  // 奖学金
+} Student;
+
+// 如果 std 指向的学生的身高不足 180 就修改为 180，体重大于 80 就修改为 80
+void hiroko (Student *std)
+{
+  if (std->height < 180)
+    std->height = 180;
+  if (std->weight > 80)
+    std->weight = 80;
+}
+
+// 输出学生 std 的信息
+void prt_std (const Student *std)
+{
+  printf("姓  名：%s\n"   , std->name);
+  printf("身  高：%d\n"   , std->height);
+  printf("体  重：%.2f\n" , std->weight);
+  printf("奖学金：%ld\n"  , std->schols);
+}
+
+int main (void)
+{
+
+  Student std;
+  printf("请输入学生的姓名（字符串）：");  scanf("%s", std.name);
+  printf("请输入学生的身高（整数）  ：");  scanf("%d", &std.height);
+  printf("请输入学生的体重（实数）  ：");  scanf("%f", &std.weight);
+  printf("请输入学生的奖学金（整数）：");  scanf("%ld", &std.schols);
+
+  puts("--------------------------------------");
+  puts("你输入的学生信息：");
+  prt_std(&std);
+
+  puts("--------------------------------------");
+  puts("调用修改函数的学生信息：");
+  hiroko(&std);
+  prt_std(&std);
+
+  return 0;
+}
+#+end_src
++ *ex 12-3:* 编写如下函数，从键盘输入 int 型、long 型和 double 型的值，
+  将这些值作为 xyz 结构体的成员，返回该结构体的值。
+  'struct xyz scan_xyz () {}'
+  #+attr_html: :width 238px
+  [[file:images/11209.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/ex1203.c
+// Description : 编写如下函数，从键盘输入 int 型、long 型和 double 型的值，
+//               将这些值作为 xyz 结构体的成员，返回该结构体的值。
+//               'struct xyz scan_xyz () {}'
+
+#include <stdio.h>
+
+struct xyz {
+  int    i;
+  long   l;
+  double d;
+};
+
+struct xyz scan_xyz ()
+{
+  struct xyz tmp;
+
+  printf("请输入一个整  数：");  scanf("%d", &tmp.i);
+  printf("请输入一个长整数：");  scanf("%ld", &tmp.l);
+  printf("请输入一个实  数：");  scanf("%lf", &tmp.d);
+
+  return tmp;
+}
+
+int main (void)
+{
+
+  struct xyz t;
+
+  t = scan_xyz();
+
+  printf("t.i = %d\n"  , t.i);
+  printf("t.l = %ld\n" , t.l);
+  printf("t.d = %lf\n" , t.d);
+
+  return 0;
+}
+#+end_src
+*** 结构体数组
++ *list 12-6:* 将 5 名学生的身高按升序排列
+  #+attr_html: :width 238px
+  [[file:images/11210.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/list1207.c
+// Description : 将 5 名学生的身高按升序排列
+
+#include <stdio.h>
+#include <string.h>
+
+#define NUMBER 5                // 学生人数
+#define NAME_LEN 64             // 姓名的字符数
+
+// 表示学生的结构体
+typedef struct {
+  char  name[NAME_LEN];         // 姓名
+  int   height;                 // 身高
+  float weight;                 // 体重
+  long  schols;                 // 奖学金
+} Student;
+
+// 将 x 和 y 指向的学生进行交换
+void swap_Student (Student *x, Student *y)
+{
+  Student tmp = *x;
+  ,*x = *y;
+  ,*y = tmp;
+}
+
+// 将学生数组 a 的前 n 个元素按身高进行升序排列
+void sort_by_height (Student a[], int n)
+{
+  int i, j;
+  for (i = 0; i < n - 1; i++) {
+    for (j = 0; j < n - i - 1; j++) {
+      if (a[j].height > a[j + 1].height)
+        swap_Student(&a[j], &a[j + 1]);
+    }
+  }
+}
+
+int main (void)
+{
+  int i;
+  Student std[] = {
+    {"Sato", 178, 61.2, 8000}, // 佐藤
+    {"Sanaka", 175, 62.5, 73000}, // 佐中
+    {"Takao", 173, 86.2, 0},      // 高尾
+    {"Mike", 165, 72.3, 70000},   // 平木
+    {"Masaki", 179, 77.5, 70000},  // 真崎
+  };
+
+  for (i = 0; i < NUMBER; i++)
+    printf("%-8s %6d%6.1f%7ld\n",
+           std[i].name, std[i].height, std[i].weight, std[i].schols);
+
+  sort_by_height(std, NUMBER);  // 按身高进行升序排列
+
+  puts("\n按身高排序。");
+  for (i = 0; i < NUMBER; i++)
+    printf("%-8s %6d%6.1f%7ld\n",
+           std[i].name, std[i].height, std[i].weight, std[i].schols);
+
+  return 0;
+}
+#+end_src
+*** 派生类型
++ *ex 12-4:* 对 list 12-7(chap12/list1207.c) 的程序进行改写：
+  1、不将姓名、身高等数据作为初始值，而是从键盘输入。
+  2、可以选择按身高进行升序排列，或者按照姓名的顺序排列。
+  #+attr_html: :width 344px
+  [[file:images/11211.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/ex1204.c
+// Description : 对 list 12-7(chap12/list1207.c) 的程序进行改写：
+//               1、不将姓名、身高等数据作为初始值，而是从键盘输入。
+//               2、可以选择按身高进行升序排列，或者按照姓名的顺序排列。
+
+#include <stdio.h>
+#include <string.h>
+
+#define NAME_LEN 64             // 姓名的字符数
+
+// 表示学生的结构体
+typedef struct {
+  char name[NAME_LEN];
+  int height;
+  float weight;
+  long schols;
+} Student;
+
+// 将 x 和 y 指向的学生进行交换
+void swap_Student (Student *x, Student *y)
+{
+  Student tmp = *x;
+  ,*x = *y;
+  ,*y = tmp;
+}
+
+// 排序
+void sort_Student (Student a[], int n, int k)
+{
+  int i, j;
+
+  if (k == 0) {                 // 根据身高进行排序
+    for (i = 0; i < n; i++) {
+      for (j = 0; j < n - i - 1; j++) {
+        if (a[j].height > a[j + 1]. height)
+          swap_Student(&a[j], &a[j + 1]);
+      }
+    }
+  }
+  if (k == 1) {                 // 根据姓名进行排序
+    for (i = 0; i < n - 1; i++) {
+      for (j = 0; j < n - i - 1; j++){
+        if (strcmp(a[j].name, a[j + 1].name) > 0)
+          swap_Student(&a[j], &a[j + 1]);
+      }
+    }
+  }
+}
+
+// 输出学生信息
+void prt_Student (const Student *std)
+{
+  // printf("姓  名：%s\n"   , std->name);
+  // printf("身  高：%d\n"   , std->height);
+  // printf("体  重：%.2f\n" , std->weight);
+  // printf("奖学金：%ld\n"  , std->schols);
+  printf("%-8s %-6d%-6.1f%-7ld\n",
+         std->name, std->height, std->weight, std->schols);
+}
+
+
+int main (void)
+{
+  int i, n, k;
+  Student std[256];
+
+  printf("输入几名学生的信息（整数）：");
+  scanf("%d", &n);
+
+  for (i = 0; i < n; i++) {
+    printf("请输入第 %d 名学生的信息：---\n", i + 1);
+    printf("            姓  名（字符串）：");  scanf("%s", std[i].name);
+    printf("            身  高（整  数）：");  scanf("%d", &std[i].height);
+    printf("            体  重（实  数）：");  scanf("%f", &std[i].weight);
+    printf("            奖学金（长整数）：");  scanf("%ld", &std[i].schols);
+  }
+
+  puts("-------------------------------------------");
+  printf("您输入的 %d 名学生的信息如下：\n", n);
+  puts("姓名     身高  体重  奖学金");
+  for (i = 0; i < n; i++){
+    prt_Student(&std[i]);
+  }
+
+  puts("-------------------------------------------");
+
+  do {
+    printf("依据什么进行排序？【0···身高 / 1···姓名】：");
+    scanf("%d", &k);
+    if (k > 1 || k < 0) {
+      puts("非法输入，请重新输入！");
+    }
+  } while (k > 1 || k < 0);
+
+  sort_Student(std, n, k);
+
+  if (k == 0)
+    puts("依据身高排序后：");
+  else
+    puts("依据姓名排序后：");
+
+  puts("姓名     身高  体重  奖学金");
+
+  for (i = 0; i < n; i++){
+    prt_Student(&std[i]);
+  }
+
+  return 0;
+}
+#+end_src
+** 12-2: 作为成员的结构体
+*** 表示坐标的结构体
++ *list 12-8:* 计算两点之间的距离
+  #+attr_html: :width 238px
+  [[file:images/11212.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/list1208.c
+// Description : 计算两点之间的距离
+
+// clang 编译此程序时需要加入编译参数 -lm 链接 math 库：
+// clang c.c -lm
+
+#include <math.h>
+#include <stdio.h>
+
+#define sqr(n) ((n) * (n))      // 计算乘方
+
+// 表示点的坐标的结构体
+typedef struct {
+  double x;                     // x 坐标
+  double y;                     // y 坐标
+} Point;
+
+// 返回点 pa 和点 pb 之间的距离
+double distance_of (Point pa, Point pb)
+{
+  return sqrt(sqr(pa.x - pb.x) + sqr(pa.y - pb.y));
+}
+
+int main (void)
+{
+
+  Point crnt, dest;
+
+  printf("当前点的 x 坐标：");  scanf("%lf", &crnt.x);
+  printf("         y 坐标：");  scanf("%lf", &crnt.y);
+  printf("目的点的 x 坐标：");  scanf("%lf", &dest.x);
+  printf("         y 坐标：");  scanf("%lf", &dest.y);
+
+  printf("当前点到目的点的距离为 %.2f\n", distance_of(crnt, dest));
+
+  return 0;
+}
+#+end_src
+*** 具有结构体成员的结构体
++ *list 12-9:* 汽车行驶
+  #+attr_html: :width 270px
+  [[file:images/11213.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/list1209.c
+// Description : 汽车行驶
+
+// clang 编译此程序时需要加入编译参数 -lm 链接 math 库：
+// clang c.c -lm
+
+#include <math.h>
+#include <stdio.h>
+
+#define sqr(n) ((n) * (n))
+
+// 表示点的坐标的结构体
+typedef struct {
+  double x;                     // x 坐标
+  double y;                     // y 坐标
+} Point;
+
+// 表示汽车的结构体
+typedef struct {
+  Point  pt;                    // 当前位置
+  double fuel;                  // 剩余燃料
+} Car;
+
+// 返回点 pa 和点 pb 之间的距离
+double distance_of (Point pa, Point pb)
+{
+  return sqrt(sqr(pa.x - pb.x) + sqr(pa.y - pb.y));
+}
+
+// 显示汽车的当前位置和剩余燃料
+void put_info (Car c)
+{
+  printf("当前位置：(%.2f, %.2f)\n", c.pt.x, c.pt.y);
+  printf("剩余燃料：%.2f升\n", c.fuel);
+}
+
+// 使 c 指向的汽车向目标坐标 dest 行驶
+int move (Car *c, Point dest)
+{
+  double d = distance_of(c->pt, dest); // 行驶距离
+  if (d > c->fuel)                     // 行驶距离超过了燃料
+    return 0;                          // 无法行驶
+  c->pt = dest;                        // 更新当前位置（向 dest 移动）
+  c->fuel -= d;                        // 更新燃料（减去行驶距离 d 所消耗的燃料）
+  return 1;                            // 行驶成功
+}
+
+int main (void)
+{
+
+  Car mycar = {{0.0, 0.0}, 90.0};
+
+  while (1) {
+    int select;
+    Point dest;                 // 目的地的坐标
+
+    put_info(mycar);            // 显示当前位置和剩余燃料
+
+    printf("开动汽车吗【Yes···1 / No···0】：");
+    scanf("%d", &select);
+    if (select != 1)
+      break;
+
+    printf("目的地的 x 坐标：");  scanf("%lf", &dest.x);
+    printf("         y 坐标：");  scanf("%lf", &dest.y);
+
+    if (!move(&mycar, dest))
+      puts("\a燃料不足无法行驶。");
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 12-5:* 改写 list 12-9(list1209.c) 的程序，使其能够选择两种方法--输入目的地坐标的方法
+  以及输入 x 方向和 y 方向的行驶距离的方法。
+  例如：假设当前值为 {5.0, 3.0}，想要移动至 {7.5, 8.9}。
+  输入坐标时输入 7.5 和 8.9，输入行驶距离时则输入 2.5 和 5.9。
+  #+attr_html: :width 350px
+  [[file:images/11214.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap12/ex1205.c
+// Description : 改写 list 12-9(list1209.c) 的程序，使其能够选择两种方法--输入目的地坐标的方法
+//               以及输入 x 方向和 y 方向的行驶距离的方法。
+//               例如：假设当前值为 {5.0, 3.0}，想要移动至 {7.5, 8.9}。
+//               输入坐标时输入 7.5 和 8.9，输入行驶距离时则输入 2.5 和 5.9。
+
+// clang 编译此程序时需要加入编译参数 -lm 链接 math 库：
+// clang c.c -lm
+
+#include <math.h>
+#include <stdio.h>
+
+#define sqr(n) ((n) * (n))
+
+// 表示点的坐标的结构体
+typedef struct {
+  double x;
+  double y;
+} Point;
+
+// 表示汽车的结构体
+typedef struct {
+  Point pt;
+  double fuel;
+} Car;
+
+// 返回点 pa 和点 pb 之间的距离
+double distance_of (Point pa, Point pb)
+{
+  return sqrt(sqr(pa.x - pb.x) + sqr(pa.y - pb.y));
+}
+
+// 显示汽车的当前位置和剩余燃料
+void put_info (Car c)
+{
+  printf("当前位置：(%.2f, %.2f)\n", c.pt.x, c.pt.y);
+  printf("剩余燃料：%.2f升\n", c.fuel);
+}
+
+// 使 c 指向的汽车向目标坐标 dest 行驶
+int move (Car *c, Point dest)
+{
+  double d = distance_of(c->pt, dest); // 行驶距离
+  if (d > c->fuel)                     // 行驶距离超过了燃料
+    return 0;                          // 无法行驶
+  c->pt = dest;                        // 更新当前位置（向 dest 移动）
+  c->fuel -= d;                        // 更新燃料（减去行驶距离 d 所消耗的燃料）
+  return 1;                            // 成功行驶
+}
+
+int main (void)
+{
+
+  Car mycar = {{0.0, 0.0}, 90.0};
+
+  while (1) {
+    int select;
+    Point dest;
+    put_info(mycar);
+    printf("开动汽车吗【Yes···1 / No···0】：");
+    scanf("%d", &select);
+    if (select != 1)
+      break;
+
+    printf("选择目的地输入方式【坐标···1 / 距离···0】：");
+    scanf("%d", &select);
+    if (select == 1) {
+      printf("目的地的 x 坐标：");  scanf("%lf", &dest.x);
+      printf("         y 坐标：");  scanf("%lf", &dest.y);
+    } else if (select == 0) {
+      printf("向 x 方向移动距离：");  scanf("%lf", &dest.x);
+      printf("向 y 方向移动距离：");  scanf("%lf", &dest.y);
+      dest.x += mycar.pt.x;
+      dest.y += mycar.pt.y;
+    }
+    if (!move(&mycar, dest))
+      puts("\a燃料不足无法行驶。");
+  }
+
+  return 0;
+}
+#+end_src
