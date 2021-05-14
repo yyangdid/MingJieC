@@ -6474,8 +6474,8 @@ int main (void)
 // Description : 求出两点之间的距离
 
 // 编译这个程序时需要添加 -lm 参数，用于链接 math 数学库。例如：
-// clang c.c -lm 或 clang -lm c.c
-// gcc c.c -lm
+// clang list0710.c -lm 或 clang -lm list0710.c
+// gcc list0710.c -lm
 
 #include <stdio.h>
 #include <math.h>
@@ -6532,7 +6532,7 @@ int main (void)
 // Description : 创建一个程序，输入一个实数作为面积，求面积为该实数的正方形的长。
 
 // 编译此文件时需要添加 -lm 参数来链接 math 库：
-// clang c.c -lm
+// clang ex0709.c -lm
 
 #include <stdio.h>
 #include <math.h>
@@ -10437,7 +10437,7 @@ int main (void)
 // Description : 计算两点之间的距离
 
 // clang 编译此程序时需要加入编译参数 -lm 链接 math 库：
-// clang c.c -lm
+// clang list1208.c -lm
 
 #include <math.h>
 #include <stdio.h>
@@ -10481,7 +10481,7 @@ int main (void)
 // Description : 汽车行驶
 
 // clang 编译此程序时需要加入编译参数 -lm 链接 math 库：
-// clang c.c -lm
+// clang list1209.c -lm
 
 #include <math.h>
 #include <stdio.h>
@@ -10565,7 +10565,7 @@ int main (void)
 //               输入坐标时输入 7.5 和 8.9，输入行驶距离时则输入 2.5 和 5.9。
 
 // clang 编译此程序时需要加入编译参数 -lm 链接 math 库：
-// clang c.c -lm
+// clang ex1205.c -lm
 
 #include <math.h>
 #include <stdio.h>
