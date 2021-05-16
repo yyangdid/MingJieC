@@ -10935,7 +10935,7 @@ int main (void)
   return 0;
 }
 #+end_src
-+ *list 13-4:* 请采用 list 13-2(chap13/list1302.c) 的文件写入形式，
++ *ex 13-4:* 请采用 list 13-2(chap13/list1302.c) 的文件写入形式，
   编写一个从键盘读取姓名、身高和体重，并将这些数据写入文件的程序。
   #+attr_html: :width 460px
   [[file:images/11307.png]]
@@ -11011,6 +11011,8 @@ int main (void)
 #+end_src
 *** 获取上一次运行时的信息
 + *list 13-4:* 显示程序上一次运行时的日期和时间
+  #+attr_html: :width 205px
+  [[file:images/11313.png]]
 #+begin_src C
 //     Charset : UTF-8(LF)
 //   File Name : chap/list1304.c
