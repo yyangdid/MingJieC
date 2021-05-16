@@ -10699,3 +10699,966 @@ int main (void)
   return 0;
 }
 #+end_src
+* 第 13 章：文件处理
+** 13-1: 文件与流
+*** 打开与关闭文件示例
++ *list 13-1:* 打开与关闭文件
+  #+attr_html: :width 238px
+  [[file:images/11301.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list1301.c
+// Description : 打开与关闭文件
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  FILE *fp;
+
+  fp = fopen("abc", "r");       // 打开文件
+
+  if (fp == NULL)
+    printf("\a无法打开文件 \"abc\"\n");
+  else {
+    printf("\a成功打开文件 \"abc\"\n");
+    fclose(fp);                 // 关闭文件
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-1:* list 13-1(chap13/list1301.c) 中的程序只能打开名为 “abc” 的文件。
+  请将程序改为从键盘读入文件名，如果存在该名称的文件，就显示 “该文件存在。”，
+  否则就显示 “该文件不存在”。
+  #+attr_html: :width 238px
+  [[file:images/11302.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1301.c
+// Description : list 13-1(chap13/list1301.c) 中的程序只能打开名为 “abc” 的文件。
+//               请将程序改为从键盘读入文件名，如果存在该名称的文件，就显示 “该文件存在。”，
+//               否则就显示 “该文件不存在”。
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  char filename[128];
+
+  printf("请输入文件名：");
+  scanf("%s", filename);
+
+  FILE *fp;
+  fp = fopen(filename, "r");
+
+  if (fp == NULL)
+    printf("\a该文件不存在！\n");
+  else {
+    printf("\a该文件存在。\n");
+    fclose(fp);
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-2:* 编写程序，从键盘读入文件名，消去该名称的文件的内容。
+  ·以只写模式打开文件即可（用只写模式 "w" 打开文件后，文件的内容就被消除了）。·
+  #+attr_html: :width 330px
+  [[file:images/11303.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1302.c
+// Description : 编写程序，从键盘读入文件名，消去该名称的文件的内容。
+//               ·以只写模式打开文件即可（用只写模式 "w" 打开文件后，文件的内容就被消除了）。·
+
+// "w" :如果文件不存在则创建新的空白文件，如果存在则清空文件内容。
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  char filename[128];
+  printf("请输入要清空文件的文件名（慎用！！）：");
+  scanf("%s", filename);
+
+  FILE *fp;
+
+  fp = fopen(filename, "w");
+
+  printf("文件 %s 的内容已被清空！！！\n", filename);
+  fclose(fp);
+
+  return 0;
+}
+#+end_src
+*** 文件数据汇总
++ *list 13-2:* 读入身高和体重，计算并显示他们的平均值
+  #+attr_html: :width 238px
+  [[file:images/11304.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list1302.c
+// Description : 读入身高和体重，计算并显示他们的平均值
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  FILE   *fp;
+  int     renshu = 0;           // 人数
+  char    name[100];            // 姓名
+  double  height, weight;       // 身高、体重
+  double  hsum   = 0.0;         // 身高合计
+  double  wsum   = 0.0;         // 体重合计
+
+  if ((fp = fopen("hw.dat", "r")) == NULL) // 打开文件
+    printf("\a文件打开失败！\n");
+  else {
+    while (fscanf(fp, "%s%lf%lf", name, &height, &weight) == 3) {
+      printf("%-10s %5.1f %5.1f\n", name, height, weight);
+      renshu++;
+      hsum += height;
+      wsum += weight;
+    }
+    printf("----------------------\n");
+    printf("平均       %5.1f %5.1f\n", hsum / renshu, wsum / renshu);
+    fclose(fp);
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-3:* 改写 list 13-2(chap13/list1302.c) 中的程序，将文件读入的个人信息按身高排序后显示。
+  #+attr_html: :width 238px
+  [[file:images/11305.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1303.c
+// Description : 改写 list 13-2(chap13/list1302.c) 中的程序，将文件读入的个人信息按身高排序后显示。
+
+#include <stdio.h>
+
+// 表示人员信息的结构体
+typedef struct human {
+  char   name[128];             // 姓名
+  double height;                // 身高
+  double weight;                // 体重
+} Human;
+
+// 将 x 和 y 指向的人进行交换
+void swap_human (Human *x, Human *y)
+{
+  Human tmp = *x;
+  ,*x = *y;
+  ,*y = tmp;
+}
+
+// 按身高进行升序排列
+void sort_by_height (Human a[], int n)
+{
+  int i, j;
+  for (i = 0; i < n; i++) {
+    for (j = 0; j < n - i - 1; j++) {
+      if (a[j].height > a[j + 1].height)
+        swap_human(&a[j], &a[j + 1]);
+    }
+  }
+}
+
+int main (void)
+{
+
+  FILE *fp;
+  Human hm[256];
+  int i;
+  int renshu = 0;               // 人数
+  double hsum = 0.0;            // 身高总和
+  double wsum = 0.0;            // 体重总和
+
+  fp = fopen("hw.dat", "r");
+  if (fp == NULL)
+    printf("文件打开失败！\n");
+  else {
+    while (fscanf(fp, "%s%lf%lf", hm[renshu].name, &hm[renshu].height, &hm[renshu].weight) == 3) {
+      hsum += hm[renshu].height;
+      wsum += hm[renshu].weight;
+      renshu++;
+    }
+    sort_by_height(hm, renshu);
+    for (i = 0; i < renshu; i++) {
+      printf("%-10s %5.1lf %5.1lf\n", hm[i].name, hm[i].height, hm[i].weight);
+    }
+    printf("----------------------\n");
+    printf("平均       %5.1lf %5.1lf\n", hsum / renshu, wsum / renshu);
+  }
+
+  return 0;
+}
+#+end_src
+*** 写入日期和时间
++ *list 13-3:* 向文件写入程序运行时的日期和时间
+  #+attr_html: :width 238px
+  [[file:images/11306.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list1303.c
+// Description : 向文件写入程序运行时的日期和时间
+
+// 个人感觉这个例子有些问题，例子使用了只写模式 "w"，用只写模式打开文件时，如果文件存在则先清空文件内容，
+// 如果文件不存在则会创建文件，以目前掌握的知识来看应该不会出现文件打开失败的情况
+
+#include <time.h>
+#include <stdio.h>
+
+int main (void)
+{
+
+  FILE      *fp;
+  time_t     current = time(NULL);          // 当前日历时间
+  struct tm *timer   = localtime(&current); // 分解时间（当地时间）
+
+  if ((fp = fopen("dt_dat", "w")) == NULL) // 打开文件
+    printf("\a文件打开失败！");
+  else {
+    printf("写入当前日期和时间。\n");
+    fprintf(fp, "%04d-%02d-%02d %02d:%02d:%02d",
+            timer->tm_year + 1900, timer->tm_mon + 1, timer->tm_mday,
+            timer->tm_hour,        timer->tm_min,     timer->tm_sec);
+    fclose(fp);
+  }
+
+  return 0;
+}
+#+end_src
++ *list 13-4:* 请采用 list 13-2(chap13/list1302.c) 的文件写入形式，
+  编写一个从键盘读取姓名、身高和体重，并将这些数据写入文件的程序。
+  #+attr_html: :width 460px
+  [[file:images/11307.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1304.c
+// Description : 请采用 list 13-2(chap13/list1302.c) 的文件写入形式，
+//               编写一个从键盘读取姓名、身高和体重，并将这些数据写入文件的程序。
+
+#include <stdio.h>
+
+#define NAME_LEN 128
+
+int main (void)
+{
+
+  FILE *fp;
+
+  int i;
+  char name[NAME_LEN];
+  double height, weight;
+
+  fp = fopen("ex1304.dat", "w");
+
+  do {
+    printf("请输入要添加的人员信息：\n");
+    printf("姓名：");  scanf("%s", name);
+    printf("身高：");  scanf("%lf", &height);
+    printf("体重：");  scanf("%lf", &weight);
+
+    fprintf(fp, "%s %.0lf %.1lf\n", name, height, weight);
+    printf("%s 的信息添加完成，是否继续添加？【Yes···1 / No···0】", name);
+    scanf("%d", &i);
+  } while (i == 1);
+
+  puts("录入的人员信息已写入 ex1304.dat 文件，程序结束。");
+
+  return 0;
+}
+#+end_src
+*** 专题 13-1: 获取当前日期和时间
++ *list 13C-1:* 显示当前日期和时间
+  #+attr_html: :width 420px
+  [[file:images/11308.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list13C1.c
+// Description : 显示当前日期和时间
+
+#include <time.h>
+#include <stdio.h>
+
+int main (void)
+{
+
+  time_t current = time(NULL);  // 当前日历时间
+  struct tm *timer = localtime(&current); // 分解时间（当地时间）
+
+  char *wday_name[] = {"日", "一", "二", "三", "四", "五", "六"};
+
+  printf("当前日期和时间为 %d 年 %d 月 %d 日 (%s) %d 时 %d 分 %d 秒。\n",
+         timer->tm_year + 1900,     // 年（加 1900 后求出）
+         timer->tm_mon + 1,         // 月（加 1 后求出）
+         timer->tm_mday,            // 日
+         wday_name[timer->tm_wday], // 星期（0~6）
+         timer->tm_hour,            // 时
+         timer->tm_min,             // 分
+         timer->tm_sec              // 秒
+         );
+
+  return 0;
+}
+#+end_src
+*** 获取上一次运行时的信息
++ *list 13-4:* 显示程序上一次运行时的日期和时间
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap/list1304.c
+// Description : 显示程序上一次运行时的日期和时间
+
+#include <time.h>
+#include <stdio.h>
+
+char data_file[] = "datatime.dat";          // 文件名
+
+// 取得并显示上一次运行时的日期和时间
+void get_data (void)
+{
+  FILE *fp;
+
+  if ((fp = fopen(data_file, "r")) == NULL) // 打开文件
+    printf("本程序是第一次运行。\n");
+  else {
+    int year, month, day, h, m, s;
+    fscanf(fp, "%d%d%d%d%d%d", &year, &month, &day, &h, &m, &s);
+    printf("上一次运行是在%d年%d月%d日%d时%d分%d秒。\n",
+           year, month, day, h, m, s);
+    fclose(fp);                             // 关闭文件
+  }
+}
+
+// 写入本次运行时的日期和时间
+void put_data (void)
+{
+  FILE *fp;
+  time_t current = time(NULL);              // 当前日历时间
+  struct tm *timer = localtime(&current);   // 分解时间
+
+  if ((fp = fopen(data_file, "w")) == NULL) // 打开文件
+    printf("\a文件打开失败。\n");
+  else {
+    fprintf(fp, "%d %d %d %d %d %d\n",
+            timer->tm_year + 1900, timer->tm_mon + 1, timer->tm_mday,
+            timer->tm_hour,        timer->tm_min,     timer->tm_sec);
+    fclose(fp);                             // 关闭文件
+  }
+}
+
+int main (void)
+{
+
+  get_data();                   // 取得并显示上一次运行时的日期和时间
+  put_data();                   // 写入本次运行时的日期和时间
+
+  return 0;
+}
+#+end_src
+*** 显示文件内容
++ *list 13-5:* 将标准输入的数据复制到标准输出
+  #+attr_html: :width 238px
+  [[file:images/11309.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list1305.c
+// Description : 将标准输入的数据复制到标准输出
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int ch;
+
+  while ((ch = getchar()) != EOF)
+    putchar(ch);
+
+  return 0;
+}
+#+end_src
++ *list 13-6:* 显示文件内容
+  #+attr_html: :width 370px
+  [[file:images/11310.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list1306.c
+// Description : 显示文件内容
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int ch;
+  FILE *fp;
+  char fname[FILENAME_MAX];             // 文件名
+
+  printf("文件名：");
+  scanf("%s", fname);
+
+  if ((fp = fopen(fname, "r")) == NULL) // 打开文件
+    printf("\a文件打开失败。\n");
+  else {
+    while ((ch = fgetc(fp)) != EOF)
+      putchar(ch);
+    fclose(fp);                         // 关闭文件
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-6:* 编写程序实现从键盘读入文件名，计算该文件的行数（换行符的个数）并显示在界面上。
+  #+attr_html: :width 238px
+  [[file:images/11311.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1306.c
+// Description : 编写程序实现从键盘读入文件名，计算该文件的行数（换行符的个数）并显示在界面上。
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int i = 0, ch;
+  FILE *fp;
+  char fname[FILENAME_MAX];
+
+  printf("请输入文件名：");
+  scanf("%s", fname);
+
+  if ((fp = fopen(fname, "r")) == NULL)
+    printf("\a文件打开失败。\n");
+  else {
+    while ((ch = fgetc(fp)) != EOF) {
+      // putchar(ch);             // 显示文件内容，此例就不输出文件内容了
+      if (ch == '\n')
+        i++;
+    }
+    printf("该文件总共有 %d 行。\n", i);
+    fclose(fp);
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-7:* 编写程序实现从键盘读入文件名，计算该文件的字符数并显示在界面上。
+  #+attr_html: :width 238px
+  [[file:images/11312.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1307.c
+// Description : 编写程序实现从键盘读入文件名，计算该文件的字符数并显示在界面上。
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int i = 0, ch;
+  FILE *fp;
+  char fname[FILENAME_MAX];
+
+  printf("请输入文件名：");
+  scanf("%s", fname);
+
+  if ((fp = fopen(fname, "r")) == NULL)
+    printf("\a文件打开失败！\n");
+  else {
+    while ((ch = fgetc(fp)) != EOF) {
+      // putchar(ch);                            // 输出显示文件内容，此例就不输出了
+      // i++;                                    // 包括换行符和空白字符
+      if (ch != '\n' && ch != ' ' && ch != '\t') // 剔除换行符、空格和制表符
+        i++;
+    }
+    printf("该文件总共有 %d 个字符。\n", i);
+    fclose(fp);
+  }
+
+  return 0;
+}
+#+end_src
+*** 文件的复制
++ *list 13-7:* 复制文件
+  #+attr_html: :width 205px
+  [[file:images/11313.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list1307.c
+// Description : 复制文件
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int ch;
+  FILE *sfp;                               // 原文件
+  FILE *dfp;                               // 目标文件
+  char sname[FILENAME_MAX];                // 原文件名
+  char dname[FILENAME_MAX];                // 目标文件名
+
+  printf("原文件名：");    scanf("%s", sname);
+  printf("目标文件名：");  scanf("%s", dname);
+
+  if ((sfp = fopen(sname, "r")) == NULL)   // 打开原文件
+    printf("\a原文件打开失败！\n");
+  else {
+    if ((dfp = fopen(dname, "w")) == NULL) // 打开目标文件
+      printf("\a目标文件打开失败！\n");
+    else {
+      while ((ch = fgetc(sfp)) != EOF)
+        fputc(ch, dfp);
+      fclose(dfp);                         // 关闭目标文件
+    }
+    fclose(sfp);                           // 关闭原文件
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-8:* 请参考 list 13-7(chap13/list1307.c) 编写一个程序，
+  在界面上显示文件内容的同时执行复制操作（即同时输出到目标文件和界面）。
+  #+attr_html: :width 205px
+  [[file:images/11313.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1308.c
+// Description : 请参考 list 13-7(chap13/list1307.c) 编写一个程序，
+//               在界面上显示文件内容的同时执行复制操作（即同时输出到目标文件和界面）。
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int ch;
+  FILE *sfp;                    // 原文件
+  FILE *dfp;                    // 目标文件
+  char sname[FILENAME_MAX];     // 原文件名
+  char dname[FILENAME_MAX];     // 目标文件名
+
+  printf("原文件名：");    scanf("%s", sname);
+  printf("目标文件名：");  scanf("%s", dname);
+
+  if ((sfp = fopen(sname, "r")) == NULL)   // 打开原文件
+    printf("\a原文件打开失败！\n");
+  else {
+    if ((dfp = fopen(dname, "w")) == NULL) // 打开目标文件
+      printf("\a目标文件打开失败！\n");
+    else {
+      while ((ch = fgetc(sfp)) != EOF) {
+        putchar(ch);                       // 显示到屏幕
+        fputc(ch, dfp);                    // 输入到目标文件
+      }
+      fclose(dfp);                         // 关闭目标文件
+    }
+    fclose(sfp);                           // 关闭原文件
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-9:* 请参考 list 13-7(chap13/list1307.c) 编写一个程序，
+  将所有英文小写字母转换为大写字母的同时执行复制操作。
+  #+attr_html: :width 205px
+  [[file:images/11313.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1309.c
+// Description : 请参考 list 13-7(chap13/list1307.c) 编写一个程序，
+//               将所有英文小写字母转换为大写字母的同时执行复制操作。
+
+#include <ctype.h>
+#include <stdio.h>
+
+int main (void)
+{
+
+  int ch;
+  FILE *sfp;                    // 原文件
+  FILE *dfp;                    // 目标文件
+  char sname[FILENAME_MAX];     // 原文件名
+  char dname[FILENAME_MAX];     // 目标文件名
+
+  printf("原文件名：");    scanf("%s", sname);
+  printf("目标文件名：");  scanf("%s", dname);
+
+  if ((sfp = fopen(sname, "r")) == NULL)
+    printf("\a原文件打开失败！\n");
+  else {
+    if ((dfp = fopen(dname, "w")) == NULL)
+      printf("\a目标文件打开失败！\n");
+    else {
+      while ((ch = fgetc(sfp)) != EOF) {
+        if (ch >='a' && ch <= 'z') {
+          ch = toupper(ch);     // 方法一：使用 ctype.h 头文件中的函数
+          // ch += 'A' - 'a';      // 方法二
+        }
+        fputc(ch, dfp);
+      }
+      fclose(dfp);
+    }
+    fclose(sfp);
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-10:* 请参考 list 13-7(chap13/list1307.c) 编写一个程序，将所有大写字母转换为小写字母的同时执行复制操作。
+  #+attr_html: :width 205px
+  [[file:images/11313.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1310.c
+// Description : 请参考 list 13-7(chap13/list1307.c) 编写一个程序，将所有大写字母转换为小写字母的同时执行复制操作。
+
+#include <ctype.h>
+#include <stdio.h>
+
+int main (void)
+{
+
+  int ch;
+  FILE *sfp;                    // 原文件
+  FILE *dfp;                    // 目标文件
+  char sname[FILENAME_MAX];     // 原文件名
+  char dname[FILENAME_MAX];     // 目标文件名
+
+  printf("原文件名：");    scanf("%s", sname);
+  printf("目标文件名：");  scanf("%s", dname);
+
+  if ((sfp = fopen(sname, "r")) == NULL)
+    printf("\a原文件打开失败！\n");
+  else {
+    if ((dfp = fopen(dname, "w")) == NULL)
+      printf("\a目标文件打开失败！\n");
+    else {
+      while ((ch = fgetc(sfp)) != EOF) {
+        if (ch >= 'A' && ch <= 'Z') {
+          // ch = tolower(ch);     // 方法一：使用 ctype.h 中的函数
+          ch -= 'A' - 'a';      // 方法二
+        }
+        fputc(ch, dfp);
+      }
+      fclose(dfp);
+    }
+    fclose(sfp);
+  }
+
+  return 0;
+}
+#+end_src
+** 文本和二进制
+*** 在文本文件中保存实数
++ *list 13-8:* 将圆周率的值写入文本文件，再进行读取
+  #+attr_html: :width 350px
+  [[file:images/11314.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list1308.c
+// Description : 将圆周率的值写入文本文件，再进行读取
+
+// 本例根据编译器和操作系统的不同，运行结果的精度可能有所不同
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  FILE *fp;
+  double pi = 3.14159265358979323846;
+
+  printf("从变量 pi 得到的圆周率为 %23.21f\n", pi);
+
+  // 写入操作
+  if ((fp = fopen("PI.txt", "w")) == NULL) // 打开文件
+    printf("\a文件打开失败！\n");
+  else {
+    fprintf(fp, "%f", pi);                 // 从 pi 写入
+    fclose(fp);                            // 关闭文件
+  }
+
+  // 读取操作
+  if ((fp = fopen("PI.txt", "r")) == NULL) // 打开文件
+    printf("\a文件打开失败！\n");
+  else {
+    fscanf(fp, "%lf", &pi);                // 读取至 pi
+    printf("从文件读取的圆周率为 %23.21f\n", pi);
+    fclose(fp);                            // 关闭文件
+  }
+
+  return 0;
+}
+#+end_src
+*** 在二进制文件中保存实数
++ *list 13-9:* 将圆周率的值写入二进制文件再进行读取
+  #+attr_html: :width 350px
+  [[file:images/11315.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list1309.c
+// Description : 将圆周率的值写入二进制文件再进行读取
+
+// 本例根据编译器和操作系统的不同，运行结果的精度可能有所不同
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  FILE *fp;
+  double pi = 3.14159265358979323846;
+
+  printf("从变量 pi 得到的圆周率为 %23.21f\n", pi);
+
+  // 写入操作
+  if ((fp = fopen("PI.bin", "wb")) == NULL) // 打开文件
+    printf("\a文件打开失败！\n");
+  else {
+    fwrite(&pi, sizeof(double), 1, fp);     // 从 pi 写入
+    fclose(fp);                             // 关闭文件
+  }
+
+  // 读取操作
+  if ((fp = fopen("PI.bin", "rb")) == NULL) // 打开文件
+    printf("\a文件打开失败！\n");
+  else {
+    fread(&pi, sizeof(double), 1, fp);      // 读取至 pi
+    printf("从文件读取的圆周率为 %23.21f\n", pi);
+    fclose(fp);                             // 关闭文件
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-11:* 编写一个程序，读取含有 10 个 double 型元素的数组的所有元素值。
+  #+attr_html: :width 238px
+  [[file:images/11316.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1311.c
+// Description : 编写一个程序，读取含有 10 个 double 型元素的数组的所有元素值。
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int i;
+  FILE *fp;
+  double d[10];
+
+  for (i = 0; i < 10; i++)      // 为数组赋值
+    d[i] = 3.14159265358979323846;
+
+  // 写入二进制文件
+  if ((fp = fopen("d.bin", "wb")) == NULL)
+    printf("\a文件打开失败！\n");
+  else {
+    fwrite(d, sizeof(double), 10, fp);
+    fclose(fp);
+  }
+
+  // 从文件中读取
+  if ((fp = fopen("d.bin", "rb")) == NULL)
+    printf("\a文件打开失败！\n");
+  else {
+    fread(d, sizeof(double), 10, fp);
+    for (i = 0; i < 10; i++)
+      printf("d[%d] = %23.21f\n", i, d[i]);
+    fclose(fp);
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-12:* 改写 list 13-4(chap13/list1304.c) 的程序，
+  将日期和时间作为 struct tm 型的值直接向二进制文件进行读写操作。
+  #+attr_html: :width 205px
+  [[file:images/11313.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1312.c
+// Description : 改写 list 13-4(chap13/list1304.c) 的程序，
+//               将日期和时间作为 struct tm 型的值直接向二进制文件进行读写操作。
+
+#include <time.h>
+#include <stdio.h>
+
+char dt_file[] = "dt.bin";      // 文件名
+
+// 取得并显示上一次运行时的日期和时间
+void get_data (void)
+{
+  FILE *fp;
+
+  if ((fp = fopen(dt_file, "rb")) == NULL)
+    printf("本程序第一次运行。\n");
+  else {
+    struct tm timer;
+    fread(&timer, sizeof(struct tm), 1, fp);
+    printf("上一次运行是在%d年%d月%d日%d时%d分%d秒\n",
+           timer.tm_year + 1900, timer.tm_mon + 1, timer.tm_mday,
+           timer.tm_hour,        timer.tm_min,     timer.tm_sec);
+    fclose(fp);
+  }
+}
+
+// 写入本次运行时的日期和时间
+void put_data (void)
+{
+  FILE *fp;
+  time_t current = time(NULL);
+  struct tm *timer = localtime(&current);
+
+  if ((fp = fopen(dt_file, "wb")) == NULL)
+    printf("文件打开失败！\n");
+  else {
+    fwrite(timer, sizeof(struct tm), 1, fp);
+    fclose(fp);
+  }
+}
+
+int main (void)
+{
+
+  get_data();
+  put_data();
+
+  return 0;
+}
+#+end_src
+*** 显示文件自身
++ *list 13-10:* 用字符和字符编码显示文件内容
+  #+attr_html: :width 540px
+  [[file:images/11317.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/list1310.c
+// Description : 用字符和字符编码显示文件内容
+
+#include <ctype.h>
+#include <stdio.h>
+
+int main (void)
+{
+
+  int n;
+  unsigned long count = 0;
+  unsigned char buf[16];
+  FILE *fp;
+  char fname[FILENAME_MAX];     // 文件名
+
+  printf("文件名：");
+  scanf("%s", fname);
+
+  if ((fp = fopen(fname, "rb")) == NULL) // 打开文件
+    printf("\a文件打开失败！\n");
+  else {
+    while ((n = fread(buf, 1, 16, fp)) > 0) {
+      int i;
+
+      printf("%08lx ", count);  // 地址
+
+      for (i = 0; i < n; i++)   // 十六进制数
+        printf("%02x ", (unsigned)buf[i]);
+
+      if (n < 16)
+        for (i = n; i < 16; i++)
+          printf("   ");
+
+      for (i = 0; i < n; i++)   // 字符
+        putchar(isprint(buf[i]) ? buf[i] : '.');
+
+      putchar('\n');
+
+      count += 16;
+    }
+    fclose(fp);                 // 关闭文件
+  }
+
+  return 0;
+}
+#+end_src
++ *ex 13-13:* 改写 list 13-7(chap13/list1307.c) 的程序，
+  将文件作为二进制文件进行复制。注意读写时使用 fread 函数和 fwrite 函数。
+  #+attr_html: :width 205px
+  [[file:images/11313.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/ex1313.c
+// Description : 改写 list 13-7(chap13/list1307.c) 的程序，
+//               将文件作为二进制文件进行复制。注意读写时使用 fread 函数和 fwrite 函数。
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int ch;
+  FILE *sfp;
+  FILE *dfp;
+  char sname[FILENAME_MAX];
+  char dname[FILENAME_MAX];
+
+  printf("原文件：");    scanf("%s", sname);
+  printf("目标文件：");  scanf("%s", dname);
+
+  if ((sfp = fopen(sname, "rb")) == NULL)
+    printf("\a原文件打开失败！\n");
+  else {
+    if ((dfp = fopen(dname, "wb")) == NULL)
+      printf("\a目标文件打开失败！\n");
+    else {
+      while (fread(&ch, sizeof(int), 1, sfp) > 0)
+        fwrite(&ch, sizeof(int), 1, dfp);
+      fclose(dfp);
+    }
+    fclose(sfp);
+  }
+
+  return 0;
+}
+#+end_src
+** 总结
++ *总结：* 将标准输入的数据写入文件
+  #+attr_html: :width 238px
+  [[file:images/11318.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap13/summary.c
+// Description : 将标准输入的数据写入文件
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int ch;
+  FILE *fp;                     // 原文件名
+  char fname[FILENAME_MAX];     // 目标文件名
+
+  printf("目标文件名：");
+  scanf("%s\n", fname);
+
+  if ((fp = fopen(fname, "w")) == NULL) // 打开目标文件
+    printf("\a目标文件打开失败！\n");
+  else {
+    while ((ch = fgetc(stdin)) != EOF)
+      fputc(ch, fp);
+    fclose(fp);                 // 关闭目标文件
+  }
+
+  return 0;
+}
+#+end_src
