@@ -631,7 +631,7 @@ int main (void)
 }
 #+end_src
 *** 单目运算符
-+ *list 2-4:* 对读取的整数值得进行符号取反操作，并输出结果
++ *list 2-4:* 对读取的整数值进行符号取反操作，并输出结果
   #+attr_html: :width 238px
   [[file:images/10206.png]]
 #+begin_src C
