@@ -1,0 +1,872 @@
+* 第 1 章：猜数游戏
+** 1-1: 猜数判定
+*** 通过 if 语句实现条件分支
++ *list 1-1:* 猜数游戏（其一：测试版）
+  #+attr_html: :width 238px
+  [[file:images/20101.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/kazuate1.c
+// Description : 猜数游戏（其一：测试版）
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int no;                       // 读取的值
+  int ans = 7;                  // 目标数字
+
+  printf("请猜一个 0~9 的整数。\n\n");
+
+  printf("是多少呢：");
+  scanf("%d", &no);
+
+  if (no > ans)
+    printf("\a再小一点。\n");
+  else if (no < ans)
+    printf("\a再大一点。\n");
+  else
+    printf("回答正确。\n");
+
+  return 0;
+}
+#+end_src
+** 1-2: 重复到猜对为止
+*** 通过 do 语句循环
++ *list 1-2:* 猜数游戏（其二：重复到猜对为止--利用 do 语句）
+  #+attr_html: :width 238px
+  [[file:images/20102.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/kazuate2.c
+// Description : 猜数游戏（其二：重复到猜对为止--利用 do 语句）
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int no;                       // 读取的值
+  int ans = 7;                  // 目标数字
+
+  printf("请猜一个 0~9 的整数。\n");
+
+  do {
+    printf("是多少呢：");
+    scanf("%d", &no);
+
+    if (no > ans)
+      printf("\a再小一点。\n");
+    else if (no < ans)
+      printf("\a再大一点。\n");
+  } while (no != ans);
+
+  printf("回答正确。\n");
+
+  return 0;
+}
+#+end_src
+*** 通过 while 语句循环
++ *list 1-3:* 猜数游戏（其二（另一种解法）：重复到猜对为止--利用 while 语句）
+  #+attr_html: :width 238px
+  [[file:images/20102.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/kazuate2while.c
+// Description : 猜数游戏（其二（另一种解法）：重复到猜对为止--利用 while 语句）
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int no;                       // 读取的值
+  int ans = 7;                  // 目标数字
+
+  printf("请猜一个 0~9 的整数。\n");
+  while (1) {
+    printf("是多少呢：");
+    scanf("%d", &no);
+
+    if (no > ans)
+      printf("\a再小一点。\n");
+    else if (no < ans)
+      printf("\a再大一点。\n");
+    else
+      break;
+  }
+
+  printf("回答正确。\n");
+
+  return 0;
+}
+#+end_src
+** 1-3: 随机设定目标数字
+*** rand 函数：生成随机数
++ *list 1-4:* 生成随机数（其一）
+  #+attr_html: :width 344px
+  [[file:images/20103.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/random1.c
+// Description : 生成随机数（其一）
+
+// 无论从头运行多少次，得到的随机数都是相同的
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int retry;                    // 再运行一次？
+
+  printf("在这个编程环境中能够生成 0~%d 的随机数。\n", RAND_MAX);
+  //                                                    ^--- rand 函数生成的最大随机数
+  do {                          // 生成 0~RAND_MAX 的随机数并返回
+    printf("\n生成了随机数 %d。\n", rand());
+    printf("再运行一次？【否(0)···是(1)】：");
+    scanf("%d", &retry);
+  } while (retry == 1);
+
+  return 0;
+}
+#+end_src
+*** srand 函数：设置用于生成随机数的种子
++ *list 1-5:* 生成随机数（其二：根据当前时间设定随机数的种子）
+  #+attr_html: :width 344px
+  [[file:images/20104.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/random2.c
+// Description : 生成随机数（其二：根据当前时间设定随机数的种子）
+
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int retry;                    // 再运行一次？
+
+  srand(time(NULL));            // 根据当前时间设定随机数的种子
+
+  printf("在这个编程环境中能够生成 0~%d 的随机数。\n", RAND_MAX);
+
+  do {
+    printf("\n生成了随机数 %d。\n", rand());
+    printf("再运行一次？【否(0)···是(1)】：");
+    scanf("%d", &retry);
+  } while (retry == 1);
+
+  return 0;
+}
+#+end_src
+*** 随机设定目标数字
++ *list 1-6:* 猜数游戏（其三：目标数字是 0~999 的随机数）
+  +     rnad() % (a+1) : 生成大于等于 0 且小于等于 a 的随机数
+  + b + rand() % (a+1) : 生成大于等于 b 且小于等于 b+a 的随机数
+  #+attr_html: :width 238px
+  [[file:images/20105.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/kazuate3.c
+// Description : 猜数游戏（其三：目标数字是 0~999 的随机数）
+
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int no;                       // 读取的值
+  int ans;                      // 目标数字
+
+  srand(time(NULL));            // 设定随机数的种子
+  ans = rand() % 1000;          // 生成 0~999 的随机数
+
+  printf("请猜一个 0~999 的整数。\n\n");
+  do {
+    printf("是多少呢：");
+    scanf("%d", &no);
+    if (no > ans)
+      printf("\a再小一点。\n");
+    else if (no < ans)
+      printf("\a再大一点。\n");
+  } while (no != ans);          // 重复到猜对为止
+
+  printf("回答正确。\n");
+
+  return 0;
+}
+#+end_src
+*** 限制输入次数
++ *list 1-7:* 猜数游戏（其四：限制输入次数）
+  #+attr_html: :width 205px
+  [[file:images/11313.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/kazuate4.c
+// Description : 猜数游戏（其四：限制输入次数）
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int no;                       // 读取的值
+  int ans;                      // 目标数字
+  const int max_stage = 10;     // 最多可以输入的次数
+  int remain = max_stage;       // 还可以输入几次
+
+  srand(time(NULL));            // 设定随机数的种子
+  ans = rand() % 1000;          // 生成 0~999 的随机数
+
+  printf("请猜一个 0~999 的整数。\n\n");
+
+  do {
+    printf("还剩 %d 次机会。是多少呢：", remain);
+    scanf("%d", &no);
+    remain--;                   // 把所剩次数进行减量
+
+    if (no > ans)
+      printf("\a再小一点。\n");
+    else if (no < ans)
+      printf("\a再大一点。\n");
+  } while (no != ans && remain > 0);
+
+  if (no != ans)
+    printf("\a很遗憾，正确答案是 %d。\n", ans);
+  else {
+    printf("回答正确。\n");
+    printf("您用了 %d 次猜中了。\n", max_stage - remain);
+  }
+
+  return 0;
+}
+#+end_src
+** 1-4: 保存输入记录
+*** 数组
++ *list 1-8:* 猜数游戏（其五：显示输入记录）
+  #+attr_html: :width 205px
+  [[file:images/11313.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/kazuate5.c
+// Description : 猜数游戏（其五：显示输入记录）
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_STAGE 10            // 最多可以输入的次数
+
+int main (void)
+{
+
+  int i;
+  int stage;                    // 已输入的次数
+  int no;                       // 读取的值
+  int ans;                      // 目标数字
+  int num[MAX_STAGE];           // 读取的值的历史记录
+
+  srand(time(NULL));            // 设定随机数的种子
+  ans = rand() % 1000;          // 生成 0~999 的随机数
+
+  printf("请猜一个 0~999 的整数。\n\n");
+
+  stage = 0;
+
+  do {
+    printf("还剩 %d 次机会。是多少呢：", MAX_STAGE - stage);
+    scanf("%d", &no);
+    num[stage++] = no;          // 把读取的值存入数组
+
+    if (no > ans)
+      printf("\a再小一点。\n");
+    else if (no < ans)
+      printf("\a再大一点。\n");
+  } while (no != ans && stage < MAX_STAGE);
+
+  if (no != ans)
+    printf("\a很遗憾，正确答案是 %d。\n", ans);
+  else {
+    printf("回答正确。\n");
+    printf("您用了 %d 次猜中了。\n", stage);
+  }
+
+  puts("\n--- 输入记录 ---");
+  for (i = 0; i < stage; i++)
+    printf("  %2d : %4d  %+4d\n", i + 1, num[i], num[i] - ans);
+
+  return 0;
+}
+#+end_src
+*** 获取数组的元素个数
++ *list 1-9:* 显示数组的元素个数和各个元素的值
+  #+attr_html: :width 238px
+  [[file:images/20106.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/array.c
+// Description : 显示数组的元素个数和各个元素的值
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int i;
+  int a[] = {1, 2, 3, 4, 5};
+  int na = sizeof(a) / sizeof(a[0]); // 元素个数
+
+  printf("数组 a 的元素个数是 %d。\n", na);
+
+  for (i = 0; i < na; i++)
+    printf("a[%d] = %d\n", i, a[i]);
+
+  return 0;
+}
+#+end_src
+** 自由演练
+*** ex 1-1
++ 编写一个 “抽签” 的程序，生成 0~6 的随机数，根据值来显示 “大吉” “中吉” “小吉” “吉” “末吉” “凶” “大凶”。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/ex0101.c
+// Description : 编写一个 “抽签” 的程序，生成 0~6 的随机数，根据值来显示 “大吉” “中吉” “小吉” “吉” “末吉” “凶” “大凶”。
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int retry;                    // 再抽一次
+  int ans;                      // 随机数
+
+  do {
+    srand(time(NULL));            // 根据当前时间设定生成随机数的种子
+    ans = rand() % 7;             // 生成 0~6 的随机数。
+    printf("您这次抽的签是：%d -> ", ans);
+
+    if (ans == 0)
+      printf("大吉\n");
+    else if (ans == 1)
+      printf("中吉\n");
+    else if (ans == 2)
+      printf("小吉\n");
+    else if (ans == 3)
+      printf("吉\n");
+    else if (ans == 4)
+      printf("末吉\n");
+    else if (ans == 5)
+      printf("凶\n");
+    else
+      printf("大凶\n");
+
+    printf("再抽一次？【Yes···0 / No···1】：");
+    scanf("%d", &retry);
+  } while (retry == 0);
+
+  return 0;
+}
+#+end_src
+*** ex 1-2
++ 把上一练习中的程序加以改良，使求出某些运势的概率与求出
+  其他运势的概率不相等（例如可以把求出 “末吉” “凶” “大凶” 的概率减小）。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/ex0102.c
+// Description : 把上一练习中的程序加以改良，使求出某些运势的概率与求出
+//               其他运势的概率不相等（例如可以把求出 “末吉” “凶” “大凶” 的概率减小）。
+
+// 解一：
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int retry;                    // 再抽一次
+  int ans;                      // 随机数
+
+  do {
+    srand(time(NULL));            // 根据当前时间设定生成随机数的种子
+    ans = rand() % 11;            // 生成 0~10 的随机数
+    printf("您这次抽的签是：%d -> ", ans);
+
+    if (ans ==0 || ans == 1)
+      printf("大吉\n");
+    else if (ans == 2 || ans == 3)
+      printf("中吉\n");
+    else if (ans == 4 || ans == 5)
+      printf("小吉\n");
+    else if (ans == 6 || ans == 7)
+      printf("吉\n");
+    else if (ans == 8)
+      printf("末吉\n");
+    else if (ans == 9)
+      printf("凶\n");
+    else
+      printf("大凶\n");
+
+    printf("再抽一次？【Yes···0 / No···1】：");
+    scanf("%d", &retry);
+  } while (retry == 0);
+
+  return 0;
+}
+#+end_src
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/ex0102.c
+// Description : 把上一练习中的程序加以改良，使求出某些运势的概率与求出
+//               其他运势的概率不相等（例如可以把求出 “末吉” “凶” “大凶” 的概率减小）。
+
+// 解二：
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int retry;           // 再抽一次
+  int ans;             // 随机数
+  int cnt;         // 计数器
+
+  do {
+    cnt = 0;
+    srand(time(NULL)); // 使用当前时间设定随机数的种子
+    ans = rand() % 7;  // 随机数
+
+    while (ans > 3 && cnt < 2) {
+      ans = rand() % 7;
+      cnt++;
+    }
+
+    printf("您这次抽的签是：%d -> ", ans);
+    if (ans == 0)
+      printf("大吉\n");
+    else if (ans == 1)
+      printf("中吉\n");
+    else if (ans == 2)
+      printf("小吉\n");
+    else if (ans == 3)
+      printf("吉\n");
+    else if (ans == 4)
+      printf("末吉\n");
+    else if (ans == 5)
+      printf("凶\n");
+    else
+      printf("大凶\n");
+
+    printf("再抽一次？【Yes···0 / No···1】：");
+    scanf("%d", &retry);
+  } while (retry == 0);
+
+  return 0;
+}
+#+end_src
+*** ex 1-3
++ 编写一个 “猜数游戏”，让目标数字是一个在 -999 和 999 之间的整数。
+  同时还需要思考应该把玩家最多可输入的次数定在多少合适。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/ex0103.c
+// Description : 编写一个 “猜数游戏”，让目标数字是一个在 -999 和 999 之间的整数。
+//               同时还需要思考应该把玩家最多可输入的次数定在多少合适。
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_STAGE 12            // 最多可以输入的次数
+
+int main (void)
+{
+
+  int i;
+  int no;                       // 读取的值
+  int ans;                      // 随机数
+  int stage;                    // 当前输入次数
+  int num[MAX_STAGE];           // 存放输入历史
+  srand(time(NULL));            // 根据当前时间设定随机数的种子
+  ans = -999 + rand() % 1999;   // 生成 -999~999 间的随机数
+
+  printf("请猜一个 -999~999 的整数。\n");
+  stage = 0;
+
+  do {
+    printf("还剩 %d 机会，请输入：", MAX_STAGE - stage);
+    scanf("%d", &no);
+    num[stage++] = no;
+
+    if (no > ans)
+      printf("\a再小一点。\n");
+    else if (no < ans)
+      printf("\a再大一点。\n");
+  } while (no != ans && stage < MAX_STAGE);
+
+  if (no != ans)
+    printf("\a很遗憾，正确答案是 %d\n", ans);
+  else {
+    printf("回答正确。\n");
+    printf("您用了 %d 次猜中了。\n", stage);
+  }
+
+  puts("\n--- 输入历史 ---");
+  for (i = 0; i < stage; i++)
+    printf(" %2d | %4d  %+4d\n", i + 1, num[i], num[i] - ans);
+
+  return 0;
+}
+#+end_src
+*** ex 1-4
++ 编写一个 “猜数游戏”，让目标数字是一个在 3 和 999 之间的倍数（例如 3，6，9，··· 999）。
+  编写以下两种功能：一种是当输入的值不是 3 的倍数时，游戏立即结束；另一种是当输入的值不是 3 的倍数时，
+  不显示目标数字和输入的数值的比较结果，直接让玩家再次输入新的数值（不作为输入次数计数）。
+  同时还需要思考应该把玩家最多可输入的次数定在多少合适。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/ex0104.c
+// Description : 编写一个 “猜数游戏”，让目标数字是一个在 3 和 999 之间的倍数（例如 3，6，9，··· 999）。
+//               编写以下两种功能：一种是当输入的值不是 3 的倍数时，游戏立即结束；另一种是当输入的值不是 3 的倍数时，
+//               不显示目标数字和输入的数值的比较结果，直接让玩家再次输入新的数值（不作为输入次数计数）。
+//               同时还需要思考应该把玩家最多可输入的次数定在多少合适。
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_STAGE 12            // 最多允许输入多少次
+
+int main (void)
+{
+
+  int no;                       // 读取的值
+  int ans;                      // 随机数
+  int stage;                    // 已经输入的次数
+  int num[MAX_STAGE];           // 存放输入历史
+
+  printf("请猜一个在 3~999 之间能被 3 整除的整数：\n");
+  ans = (1 + rand() % 333) * 3;
+  stage = 0;
+
+  do {
+    printf("你还有 %d 次机会，请输入：", MAX_STAGE - stage);
+    scanf("%d", &no);
+
+    // 第一种：当输入不是 3 的倍数时，游戏立即结束
+    // if (no % 3) {
+    //   puts("\a非法输入，程序结束！");
+    //   return -1;
+    // }
+
+    // 第二种：
+    while (no % 3) {
+      printf("\a非法输入，请重新输入：");
+      scanf("%d", &no);
+    }
+
+    num[stage++] = no;
+
+    if (no > ans)
+      printf("\a再小一些。\n");
+    else if (no < ans)
+      printf("\a再大一些。\n");
+    else
+      break;
+  } while (no != ans && stage < MAX_STAGE);
+
+  if (no != ans)
+    printf("\a很遗憾，正确答案是 %d\n", ans);
+  else {
+    printf("回答正确！");
+    printf("您用了 %d 次猜对了。\n", stage);
+  }
+
+  puts("\n--- 输入历史 ---");
+  for (int i = 0; i < stage; i++)
+    printf(" %2d | %4d %+4d\n", i + 1, num[i], num[i] - ans);
+
+  return 0;
+}
+#+end_src
+*** ex 1-5
++ 编写一个 “猜数游戏”，不事先决定目标数字的范围，而是在运行程序时才用随机数决定目标数字。
+  打个比方，如果生成的两个随机数是 23 和 8124，那么玩家就需要猜一个在 23 和 8124 之间数字。
+  另外，根据目标数字的范围自动（根据程序内部的计算）选定一个合适的值，作为玩家做多可输入的次数。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/ex0105.c
+// Description : 编写一个 “猜数游戏”，不事先决定目标数字的范围，而是在运行程序时才用随机数决定目标数字。
+//               打个比方，如果生成的两个随机数是 23 和 8124，那么玩家就需要猜一个在 23 和 8124 之间数字。
+//               另外，根据目标数字的范围自动（根据程序内部的计算）选定一个合适的值，作为玩家做多可输入的次数。
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int no;                       // 读取的值
+  int max_stage = 1;            // 最大输入次数
+  int stage;                    // 已经输入的次数
+  int ans_min;                  // 随机数的最小值
+  int ans_max;                  // 随机数的最大值
+  int ans;                      // 随机数
+  int tmp;
+  int num[128];                 // 输入历史
+
+  srand(time(NULL));
+  ans_min = rand() % 101;        // 0~100
+  ans_max = 200 + rand() % 9800; // 200~9999
+
+  if (ans_min > ans_max) {
+    tmp = ans_min;
+    ans_min = ans_max;
+    ans_max = tmp;
+  }
+
+  ans = ans_min + rand() % (ans_max-ans_min +1);
+
+  // 二分法算最大输入次数
+  tmp = ans_max - ans_min;
+  do {
+    tmp /= 2;
+    max_stage++;
+  } while (tmp != 1);
+
+  printf("猜一个在 %d~%d 之间的整数，你有 %d 次机会。\n", ans_min, ans_max, max_stage);
+  stage = 0;
+  do {
+    printf("还有 %d 次机会，请输入：", max_stage - stage);
+    scanf("%d", &no);
+    num[stage++] = no;
+
+    if (no > ans)
+      printf("\a再小一些。\n");
+    else if (no < ans)
+      printf("\a再大一些。\n");
+  } while (no != ans && stage < max_stage);
+
+  if (no != ans)
+    printf("\a很遗憾，正确答案是 %d\n", ans);
+  else {
+    printf("回答正确。\n");
+    printf("使用了 %d 次\n", stage);
+  }
+
+  puts("\n--- 输入历史 ---");
+  for (int i = 0; i < stage; i++)
+    printf(" %2d | %4d %+4d\n", i + 1, num[i], num[i] - ans);
+
+  return 0;
+}
+#+end_src
+*** ex 1-6
++ 编写一个 “猜数游戏”，让玩家能在游戏开始时选择难度等级，比如向这样：
+  请选择难度等级 (1)1~9 (2)1~99 (3)1~999 (4)1~9999
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/ex0106.c
+// Description : 编写一个 “猜数游戏”，让玩家能在游戏开始时选择难度等级，比如向这样：
+//               请选择难度等级 (1)1~9 (2)1~99 (3)1~999 (4)1~9999
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int dj;                       // 难度等级
+  int no;                       // 读取的值
+  int ans;                      // 随机数
+  int max_stage = 1;            // 最大输入次数
+  int stage;                    // 已经输入次数
+  int num[128];                 // 历史记录
+  int ans_max;                  // 最大随机数
+  int tmp;
+
+  do {
+    printf("[1]1~9 [2]1~99 [3]1~999 [4]1~9999\n");
+    printf("请选择难度等级：");
+    scanf("%d", &dj);
+  } while (dj > 4 || dj <1);
+
+  switch (dj) {
+  case 1:
+    ans_max = 9;
+    break;
+  case 2:
+    ans_max = 99;
+    break;
+  case 3:
+    ans_max = 999;
+    break;
+  default :
+    ans_max = 9999;
+  }
+
+  // 计算允许最大输入次数
+  tmp = ans_max - 1;
+  do {
+    tmp /= 2;
+    max_stage++;
+  } while (tmp > 1);
+
+  srand(time(NULL));            // 根据当前时间设定随机数种子
+  ans = 1 + rand() % ans_max;        // 生成随机数
+  stage = 0;
+
+  puts("游戏开始！");
+  do {
+    printf("您还有 %d 次机会，请输入 1~%d 之间的数字：", max_stage - stage, ans_max);
+    scanf("%d", &no);
+    num[stage++] = no;
+
+    if (no > ans)
+      printf("\a再小一些。\n");
+    else if (no < ans)
+      printf("\a再大一些。\n");
+  } while (no != ans && stage < max_stage);
+
+  if (no != ans)
+    printf("\a很遗憾，正确答案是 %d\n", ans);
+  else {
+    printf("回答正确！\n");
+    printf("您使用了 %d 次猜中了。\n", stage);
+  }
+
+  puts("\n--- 输入历史 ---");
+  for (int i = 0; i < stage; i++)
+    printf(" %2d | %4d  %+4d\n", i + 1, num[i], num[i] - ans);
+
+  return 0;
+}
+#+end_src
+*** ex 1-7
++ 使用 list 1-8(chap01/kazuate5.c) 的程序时，即使玩家所猜数字和正确答案的差值是 0，
+  输入记录的显示结果也会带有符号，这样不太好看。请大家改进一下程序，让差值 0 不带符号。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/ex0107.c
+// Description : 使用 list 1-8(chap01/kazuate5.c) 的程序时，即使玩家所猜数字和正确答案的差值是 0，
+//               输入记录的显示结果也会带有符号，这样不太好看。请大家改进一下程序，让差值 0 不带符号。
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_STAGE 10            // 最多可以输入的次数
+
+int main (void)
+{
+
+  int i;
+  int stage;                    // 已输入的次数
+  int no;                       // 读取的值
+  int ans;                      // 目标数字
+  int num[MAX_STAGE];           // 读取的值的历史记录
+
+  srand(time(NULL));            // 设定随机数的种子
+  ans = rand() % 1000;          // 生成 0~999 的随机数
+
+  printf("请猜一个 0~999 的整数。\n\n");
+
+  stage = 0;
+
+  do {
+    printf("还剩 %d 次机会。是多少呢：", MAX_STAGE - stage);
+    scanf("%d", &no);
+    num[stage++] = no;          // 把读取的值存入数组
+
+    if (no > ans)
+      printf("\a再小一点。\n");
+    else if (no < ans)
+      printf("\a再大一点。\n");
+  } while (no != ans && stage < MAX_STAGE);
+
+  if (no != ans)
+    printf("\a很遗憾，正确答案是 %d。\n", ans);
+  else {
+    printf("回答正确。\n");
+    printf("您用了 %d 次猜中了。\n", stage);
+  }
+
+  puts("\n--- 输入记录 ---");
+  for (i = 0; i < stage; i++) {
+    printf(" %2d | %4d", i + 1, num[i]);
+    if (num[i] - ans)
+      printf(" %+4d\n", num[i] - ans);
+    else
+      printf(" %4d\n", num[i] - ans);
+  }
+
+  return 0;
+}
+#+end_src
+*** ex 1-8
++ 把 list 1-8(chap01/kazuate5.c) 里的 do 语句改成 for 语句。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap01/ex0108.c
+// Description : 把 list 1-8(chap01/kazuate5.c) 里的 do 语句改成 for 语句。
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_STAGE 10            // 最多可以输入的次数
+
+int main (void)
+{
+
+  int i;
+  int stage;                    // 已输入的次数
+  int no;                       // 读取的值
+  int ans;                      // 目标数字
+  int num[MAX_STAGE];           // 读取的值的历史记录
+
+  srand(time(NULL));            // 设定随机数的种子
+  ans = rand() % 1000;          // 生成 0~999 的随机数
+
+  printf("请猜一个 0~999 的整数。\n\n");
+
+  for (stage = 0; no != ans && stage < MAX_STAGE; stage++) {
+    printf("还剩 %d 次机会。是多少呢：", MAX_STAGE - stage);
+    scanf("%d", &no);
+    num[stage] = no;            // 把读取的值存入数组
+
+    if (no > ans)
+      printf("\a再小一点。\n");
+    else if (no < ans)
+      printf("\a再大一点。\n");
+  }
+  if (no != ans)
+    printf("\a很遗憾，正确答案是 %d。\n", ans);
+  else {
+    printf("回答正确。\n");
+    printf("您用了 %d 次猜中了。\n", stage);
+  }
+
+  puts("\n--- 输入记录 ---");
+  for (i = 0; i < stage; i++)
+    printf("  %2d : %4d  %+4d\n", i + 1, num[i], num[i] - ans);
+
+  return 0;
+}
+#+end_src
