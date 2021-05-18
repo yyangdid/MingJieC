@@ -870,3 +870,871 @@ int main (void)
   return 0;
 }
 #+end_src
+* 第 2 章：专注于显示
+** 2-1: 熟练运用转义字符
+*** \n : 换行符
++ *list 2-1:* 输出警报符 \a 和换行符 \n
+  #+attr_html: :width 238px
+  [[file:images/20107.png]]
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/alert_newline.c
+// Description : 输出警报符 \a 和换行符 \n
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  printf("你好。\n初次见面。\n");
+  printf("\a警告。\n\n");
+  printf("\a\a这次是第 2 次警告。\n");
+
+  return 0;
+}
+#+end_src
+*** \b : 退格符
++ *list 2-2:* 退格符 \b 的使用示例，每隔 1 秒消去一个字符
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/backspace.c
+// Description : 退格符 \b 的使用示例，每隔 1 秒消去一个字符
+
+#include <time.h>
+#include <stdio.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+  do {
+    if ((c2 = clock()) == (clock_t) - 1) // 错误
+      return 0;
+  } while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+
+int main (void)
+{
+
+  int i;
+  printf("ABCDEFG");
+  for (i = 0; i < 7; i++) {
+    sleep(1000);                // 每隔 1 秒
+    printf("\b \b");            // 从后面逐个消除字符
+    fflush(stdout);             // 清空缓冲区
+  }
+
+  return 0;
+}
+#+end_src
+*** \r : 回车符
++ *list 2-3:* 回车符 \r 的使用示例：重写行
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/return.c
+// Description : 回车符 \r 的使用示例：重写行
+
+#include <time.h>
+#include <stdio.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+  do {
+    if ((c2 = clock()) == (clock_t) - 1) // 错误
+      return 0;
+  } while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+
+int main (void)
+{
+
+  printf("My name is BohYoh.");
+  fflush(stdout);
+
+  sleep(2000);
+  printf("\rHow do you do?    ");
+  fflush(stdout);
+
+  sleep(2000);
+  printf("\rThanks.           \n");
+
+  return 0;
+}
+#+end_src
+*** \' 和 \" ：单引号和双引号
++ *list 2-4:* 转义字符 \' 和 \" 的使用示例
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/quotation.c
+// Description : 转义字符 \' 和 \" 的使用示例
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  printf("关于字符串常量和字符常量。\n");
+
+  printf("双引号");
+  putchar('"');                                      // 可以用 \"
+  printf("用双引号括起来的\"ABC\"是字符串常量。\n"); // 不可以用 "
+
+  printf("单引号");
+  putchar('\'');                                     // 不可以用 '
+  printf("用单引号括起来的'A'是字符常量。\n");        // 可以用 \'
+
+  return 0;
+}
+#+end_src
+** 2-2 : 操纵时间
+*** clock 函数：获取程序启动后经过的时间
++ *list 2-5:* 倒计时后显示程序运行时间
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/countdown.c
+// Description : 倒计时后显示程序运行时间
+
+#include <time.h>
+#include <stdio.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+
+  do {
+    if ((c2 = clock()) == (clock_t) - 1) // 错误
+      return 0;
+  } while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+
+int main (void)
+{
+
+  int     i;
+  clock_t c;
+
+  for (i = 10; i > 0; i--) {
+    printf("\r%2d", i);
+    fflush(stdout);
+    sleep(1000);                // 暂停 1 秒
+  }
+  printf("\r\aFIRE!!\n");
+
+  c = clock();
+  printf("程序开始运行后经过了 %.1f 秒。\n",
+         (double)c / CLOCKS_PER_SEC);
+
+  return 0;
+}
+#+end_src
+*** 计算处理所需的时间
++ *list 2-6:* 心算训练（连加 3 个三位数的整数）
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/mental.c
+// Description : 心算训练（连加 3 个三位数的整数）
+
+// 此例在 windows 下没问题，在 linux 下的时间总是为 0.0 秒
+// linux 下可以使用 gettimeofday() time() 函数，这里先放过
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int a, b, c;                  // 要进行加法运算的数值
+  int x;                        // 已读取的值
+  clock_t start, end;           // 开始时间和结束时间
+  double req_time;              // 所需时间
+
+  srand(time(NULL));            // 根据当前时间设定随机数的种子
+
+  a = 100 + rand() % 900;       // 生成 100~999 的随机数
+  b = 100 + rand() % 900;
+  c = 100 + rand() % 900;
+
+  printf("%d + %d + %d 等于多少：", a, b, c);
+
+  start = clock();              // 开始计时
+
+  while (1) {
+    scanf("%d", &x);
+    if (x == a + b + c)
+      break;
+    printf("\a回答错误！！\n请重新输入：");
+  }
+
+  end = clock();                // 计时结束
+
+  req_time = (double)(end - start) / CLOCKS_PER_SEC;
+
+  printf("用时 %.1f 秒。\n", req_time);
+
+  if (req_time > 30.0)
+    printf("花太长时间了。\n");
+  else if (req_time > 17.0)
+    printf("还行吧。\n");
+  else
+    printf("真快啊。\n");
+
+  return 0;
+}
+#+end_src
+*** 暂停处理一段时间
++ *list 2-7:* 等待 x 毫秒
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/sleep.c
+// Description : 等待 x 毫秒
+
+// 其实是这个函数一直占用着 CPU，是让 CPU 持续运行了 x 毫秒，并不是释放 CPU，CPU 一直在运行这个函数里面的内容
+
+#include <time.h>
+
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+
+  do {
+    if ((c2 = clock()) == (clock_t) - 1)
+      return 0;
+  } while (1000.0 * (c2 - c2) / CLOCKS_PER_SEC < x>);
+  return 1;
+}
+#+end_src
+** 2-3 : 字幕显示
+*** 逐个显示并消除字符
++ *list 2-8:* 逐个显示字符，待字符串显示完毕后，再从后往前逐个消去字符，反复执行此操作
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/elastic.c
+// Description : 逐个显示字符，待字符串显示完毕后，再从后往前逐个消去字符，反复执行此操作
+
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+  do {
+    if ((c2 = clock()) == (clock_t) - 1)
+      return 0;
+  } while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+
+int main (void)
+{
+
+  int i;
+  char name[]  = "BohYoh Shibata"; // 要显示的字符串
+  int name_len = strlen(name);     // 字符串 name 的字符数
+
+  while (1) {                   // 无限循环
+    for (i = 0; i < name_len; i++) { // 从头开始逐个显示字符
+      putchar(name[i]);
+      fflush(stdout);
+      sleep(500);
+    }
+    for (i = 0; i < name_len; i++) { // 从末尾开始逐个消去字符
+      printf("\b \b");
+      fflush(stdout);
+      sleep(500);
+    }
+  }
+
+  return 0;
+}
+#+end_src
+*** 字幕显示（从有往左）
++ *list 2-9:* 用字幕显示名字（其一：从有往左滚动字符）
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/telop1.c
+// Description : 用字幕显示名字（其一：从有往左滚动字符）
+
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+  do {
+    if ((c2 = clock()) == (clock_t) - 1)
+      return 0;
+  } while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+int main (void)
+{
+
+  int i;
+  int cnt      = 0;             // 第几个字符在最前面
+  char name[]  = "BohYoh ";     // 要显示的字符串
+  int name_len = strlen(name);  // 字符串 name 的字符数
+
+  while (1) {
+    putchar('\r');              // 把光标移到本行开头
+    for (i = 0; i < name_len; i++) {
+      if (cnt + i < name_len)
+        putchar(name[cnt + i]);
+      else
+        putchar(name[cnt + i - name_len]);
+    }
+    fflush(stdout);
+    sleep(500);
+
+    if (cnt < name_len - 1)
+      cnt++;                    // 下次从后一个字符开始显示
+    else
+      cnt = 0;                  // 下次从最前面的字符开始显示
+  }
+
+  return 0;
+}
+#+end_src
+*** 字幕显示（从左往右）
++ *list 2-10:* 用字幕显示名字（其二：从左往右滚动字符）
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/telop2.c
+// Description : 用字幕显示名字（其二：从左往右滚动字符）
+
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+  do {
+    if ((c2 = clock()) == (clock_t) - 1)
+      return 0;
+  }while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+
+int main (void)
+{
+
+  int i;
+  int cnt      = 0;             // 第几个字符在最前面
+  char name[]  = "BohYoh ";     // 要显示的字符串
+  int name_len = strlen(name);  // 字符串 name 的字符数
+
+  while (1) {
+    putchar('\r');              // 把光标移到本行开头
+    for (i = 0; i < name_len; i++) {
+      if (cnt + i < name_len)
+        putchar(name[cnt + i]);
+      else
+        putchar(name[cnt + i - name_len]);
+    }
+    fflush(stdout);
+    sleep(500);
+    if (cnt > 0)
+      cnt--;
+    else
+      cnt = name_len - 1;       // 下次从最前面的字符开始显示
+  }
+
+  return 0;
+}
+#+end_src
+** 2-4 : 格式输入输出
+*** 把要显示的位数指定为变量
++ *list 2-11:* 把数字字符每次偏移 1 位显示（其一）
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/stair1.c
+// Description : 把数字字符每次偏移 1 位显示（其一）
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int i, j;
+  int x;                        // 要显示的行数
+
+  printf("要显示多少行：");
+  scanf("%d", &x);
+
+  for (i = 1; i <= x; i++) {
+    for (j = 1; j < i; j++)
+      putchar(' ');
+    printf("%d\n", i % 10);
+  }
+
+  return 0;
+}
+#+end_src
++ *list 2-12:* 把数字字符每次偏移 1 位显示（其二）
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/stair2.c
+// Description : 把数字字符每次偏移 1 位显示（其二）
+
+#include <stdio.h>
+
+int main (void)
+{
+
+  int i;
+  int x;                        // 要显示的行数
+
+  printf("要显示多少行：");
+  scanf("%d", &x);
+
+  for (i = 1; i <= x; i++)
+    printf("%*d\n", i, i % 10);
+
+  return 0;
+}
+#+end_src
+*** 显示任意数量的空白字符
++ *list 2-13:* 同时训练扩大水平方向视野的心算训练
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/vision.c
+// Description : 同时训练扩大水平方向视野的心算训练
+
+// 在 linux 下计时无效，因为 clock() 函数在 linux 和 windows 下的功能不同。本程序在 windows 下计时没问题
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int stage;
+  int a, b, c;                   // 要进行加法运算的数值
+  int x;                        // 已读取的值
+  int n;                        // 空白的宽度
+  clock_t start, end;           // 开始时间，结束时间
+
+  srand(time(NULL));            // 根据当前时间设定随机数的种子
+
+  printf("扩大视野心算训练开始！！\n");
+  start = clock();              // 计时开始
+
+  for (stage = 0; stage < 10; stage++) {
+    a = 10 + rand() % 90;       // 生成 10~99 的随机数
+    b = 10 + rand() % 90;
+    c = 10 + rand() % 90;
+    n = rand() % 17;            // 生成 0~16 的随机数
+
+    printf("%d%*s+%*s%d%*s+%*s%d: ", a, n, "", n, "", b, n, "", n, "", c);
+
+    do {
+      scanf("%d", &x);
+      if (x == a + b + c)
+        break;
+      printf("\a回答错误。请重新输入：");
+    } while (1);
+  }
+  end = clock();              // 计时结束
+  printf("用时%.1f秒。\n", (double)(end - start) / CLOCKS_PER_SEC);
+
+  return 0;
+}
+#+end_src
+** 自由演练
+*** ex 2-1
++ list 2-5(chap02/countdown.c) 是一个用秒数来表示程序开始后经过的时间的程序。
+  请改写程序，令其不仅能用秒数，还能用时钟数来表示时间。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/ex0201.c
+// Description : list 2-5(chap02/countdown.c) 是一个用秒数来表示程序开始后经过的时间的程序。
+//               请改写程序，令其不仅能用秒数，还能用时钟数来表示时间。
+
+#include <time.h>
+#include <stdio.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+  do {
+    if ((c2 = clock()) == (clock_t) - 1)
+      return 0;
+  } while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+
+int main (void)
+{
+
+  int i;
+  clock_t c;
+
+  for (i = 10; i > 0; i--) {
+    printf("\r%2d", i);
+    printf("  时钟数 = %ld", clock());
+    fflush(stdout);
+    sleep(1000);
+  }
+  printf("\r\aFIRE!!");
+  printf("  时钟数 = %ld", clock());
+  c = clock();
+  printf("\n程序开始运行后经过了 %.1f 秒\n",
+         (double)c / CLOCKS_PER_SEC);
+
+  return 0;
+}
+#+end_src
+*** ex 2-2
++ 编写一个函数，令其能从字符串开头逐一显示字符。
+  'void gput (const char *s, int speed)'
+  在这里，s 是要显示的字符串，speed 是以毫秒为单位的显示速度。例如调用代码 'gput("ABC", 100)' ，
+  首先会显示 'A'，100 毫秒后显示 'B'，再过 100 毫秒后显示 'C'。
+  当显示完 "ABC" 字符串的所有字符后，返回返回到调用方。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/ex0202.c
+// Description : 编写一个函数，令其能从字符串开头逐一显示字符。
+//               'void gput (const char *s, int speed)'
+//               在这里，s 是要显示的字符串，speed 是以毫秒为单位的显示速度。例如调用代码 'gput("ABC", 100)' ，
+//               首先会显示 'A'，100 毫秒后显示 'B'，再过 100 毫秒后显示 'C'。
+//               当显示完 "ABC" 字符串的所有字符后，返回返回到调用方。
+
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+  do {
+    if ((c2 = clock()) == (clock_t) - 1)
+      return 0;
+  } while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+
+// 逐字符显示字符串 s，字符显示间隔为 speed 毫秒
+void gput (const char *s, int speed)
+{
+  int s_len = strlen(s);
+  for (int i = 0; i < s_len; i++) {
+    printf("%c", s[i]);         // 或 putchar(s[i]);
+    fflush(stdout);
+    sleep(speed);
+  }
+}
+
+int main (void)
+{
+
+  char *str;
+  int speed;
+
+  printf("请输入一个字符串：");
+  scanf("%s", str);
+  printf("请输入毫秒：");
+  scanf("%d", &speed);
+
+  gput(str, speed);
+  putchar('\n');
+
+  return 0;
+}
+#+end_src
+*** ex 2-3
++ 编写一个闪烁显示字符串的函数。
+  'void bput (const char *s, int d, int e, int n)'
+  字符串 s 显示 d 毫秒后，消失 e 毫秒，反复执行上述操作 n 次后返回到调用方。
+  （不妨假设u字符串 s 只有一行（即不包含换行符等符号，而且字符串的长度小于控制台画面的宽度））。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap-3/ex0203.c
+// Description : 编写一个闪烁显示字符串的函数。
+//               'void bput (const char *s, int d, int e, int n)'
+//               字符串 s 显示 d 毫秒后，消失 e 毫秒，反复执行上述操作 n 次后返回到调用方。
+//              （不妨假设u字符串 s 只有一行（即不包含换行符等符号，而且字符串的长度小于控制台画面的宽度））。
+
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+  do {
+    if ((c2 = clock()) == (clock_t) - 1)
+      return 0;
+  } while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+
+// 字符串 s 显示 d 毫秒后，消失 e 毫秒，反复执行上述操作后 n 次返回
+void bput (const char *s, int d, int e, int n)
+{
+  int s_len = strlen(s);
+  for (int i = 0; i < n; i++) {
+    printf("\r%s", s);
+    fflush(stdout);
+    sleep(d);
+    putchar('\r');
+
+    for (int j = 0; j < s_len; j++) { // 使用字符串 s 长度个空格把字符串覆盖掉
+      putchar(' ');
+    }
+    fflush(stdout);
+    sleep(e);
+  }
+}
+
+int main (void)
+{
+
+  char *s;
+  int d, e, n;
+  printf("请输入一个字符串：");  scanf("%s", s);
+  printf("显示多少毫秒：");      scanf("%d", &d);
+  printf("消失多少毫秒：");      scanf("%d", &e);
+  printf("重复多少次：");        scanf("%d", &n);
+
+  bput(s, d, e, n);
+  putchar('\n');
+
+  return 0;
+}
+#+end_src
+*** ex 2-4
++ 编写一个如字幕般显示字符串的函数。
+  'void telop(const char *s, int direction, int speed, int n)'
+  其中， s 是要显示的字符串，direction 是字幕滚动的方向（从右往左是 0，从左往右是 1），
+  speed 是以毫秒为单位的速度，n 是显示次数。
+  (不妨假设字符串 s 只有一行)。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/ex0204.c
+// Description : 编写一个如字幕般显示字符串的函数。
+//               'void telop(const char *s, int direction, int speed, int n)'
+//               其中， s 是要显示的字符串，direction 是字幕滚动的方向（从右往左是 0，从左往右是 1），
+//               speed 是以毫秒为单位的速度，n 是显示次数。
+//               (不妨假设字符串 s 只有一行)。
+
+#include <time.h>
+#include <stdio.h>
+#include <string.h>
+
+// 等待 x 毫秒
+int sleep (unsigned long x)
+{
+  clock_t c1 = clock(), c2;
+  do {
+    if ((c2 = clock()) == (clock_t) - 1)
+      return 0;
+  } while (1000.0 * (c2 - c1) / CLOCKS_PER_SEC < x);
+  return 1;
+}
+
+// 滚动显示字符串
+void telop (const char *s, int direction, int speed, int n)
+{
+  int cnt = 0;                  // 第几个字符在最前面
+  int s_len = strlen(s);        // 字符串 s 的字符数
+
+  while (n) {
+    putchar('\r');              // 光标移到行首
+    for (int i = 0; i < s_len; i++) {
+      if (cnt + i < s_len)
+        putchar(s[cnt + i]);
+      else
+        putchar(s[cnt + i -s_len]);
+    }
+    fflush(stdout);
+    sleep(speed);
+    if (direction) {
+      if (cnt > 0)
+        cnt--;
+      else {
+        cnt = s_len - 1;
+        n--;
+      }
+    } else {
+      if (cnt < s_len - 1)
+        cnt++;
+      else {
+        cnt = 0;
+        n--;
+      }
+    }
+  }
+}
+
+int main (void)
+{
+
+  char *s;
+  char *scat = " ";
+  int direction;
+  int speed;
+  int n;
+
+  printf("请输入字符串：");  scanf("%s", s);
+  printf("请选择滚动方向【0···从右往左 / 1···从左往右】：");  scanf("%d", &direction);
+  printf("请输入滚动速度(毫秒)："); scanf("%d", &speed);
+  printf("请输入滚动次数："); scanf("%d", &n);
+
+  strcat(s, scat);
+
+  telop(s, direction, speed, n);
+  putchar('\n');
+
+  return 0;
+}
+#+end_src
+*** ex 2-5
++ list 2-13(chap02/vision.c) 的 “心算训练” 程序显示的是进行 10 次加法运算所需要的时间。
+  改写程序，令其能显示每次运算所需要的时间和运算的平均时间。
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/ex0205.c
+// Description : list 2-13(chap02/vision.c) 的 “心算训练” 程序显示的是进行 10 次加法运算所需要的时间。
+//               改写程序，令其能显示每次运算所需要的时间和运算的平均时间。
+
+// 本题计时在 linux 下运行不正常，在 windows 下正常
+// linux 下用 gettimeofday() 或 time() 函数代替 clock()
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int stage;
+  int a, b, c;                   // 要进行加法运算的数值
+  int x;                        // 已读取的值
+  int n;                        // 空白的宽度
+  clock_t start, end;           // 开始时间，结束时间
+  double tm;                    // 每答对一题用时
+  double tm_sum = 0.0;          // 总用时
+
+  srand(time(NULL));            // 根据当前时间设定随机数的种子
+
+  printf("扩大视野心算训练开始！！\n");
+
+  for (stage = 0; stage < 10; stage++) {
+    a = 10 + rand() % 90;       // 生成 10~99 的随机数
+    b = 10 + rand() % 90;
+    c = 10 + rand() % 90;
+    n = rand() % 17;            // 生成 0~16 的随机数
+
+    printf("%d%*s+%*s%d%*s+%*s%d: ", a, n, "", n, "", b, n, "", n, "", c);
+    start = clock();              // 计时开始
+
+    do {
+      scanf("%d", &x);
+      if (x == a + b + c)
+        end = clock();              // 计时结束
+      break;
+      printf("\a回答错误。请重新输入：");
+    } while (1);
+    tm = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("本题用时 %.1f 秒\n", tm);
+    tm_sum += tm;
+  }
+  printf("总计用时 %.1f 秒，平均每道题用时 %.1f 秒\n", tm_sum, tm_sum / 10);
+
+  return 0;
+}
+#+end_src
+*** ex 2-6
++ 把上面的程序改写成能进行加法和减法运算的程序，每次随机决定进行哪种运算。
+  也就是说假设三个值是 a、b、c，每次都通过随机数来从下列组合中选一个进行出题。
+  + a + b + c
+  + a + b - c
+  + a - b + c
+  + a - b - c
+#+begin_src C
+//     Charset : UTF-8(LF)
+//   File Name : chap02/ex0206.c
+// Description : 把上面的程序改写成能进行加法和减法运算的程序，每次随机决定进行哪种运算。
+//               也就是说假设三个值是 a、b、c，每次都通过随机数来从下列组合中选一个进行出题。
+//               a + b + c
+//               a + b - c
+//               a - b + c
+//               a - b - c
+
+// 本题计时在 linux 下运行不正常，在 windows 下正常
+// linux 下用 gettimeofday() 或 time() 函数代替 clock()
+
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+int main (void)
+{
+
+  int stage;
+  int a, b, c;                  // 要进行加法运算的数值
+  int x;                        // 已读取的值
+  int n;                        // 空白的宽度
+  int z;                        // 题型
+  clock_t start, end;           // 开始时间，结束时间
+  double tm;                    // 每答对一题用时
+  double tm_sum = 0.0;          // 总用时
+
+  srand(time(NULL));            // 根据当前时间设定随机数的种子
+
+  printf("扩大视野心算训练开始！！\n");
+
+  for (stage = 0; stage < 10; stage++) {
+    a = 10 + rand() % 90;       // 生成 10~99 的随机数
+    b = 10 + rand() % 90;
+    c = 10 + rand() % 90;
+    n = rand() % 17;            // 生成 0~16 的随机数
+    z = rand() % 4;             // 生成 0~3 的随机数
+
+    switch (z) {
+    case 0 :
+      printf("%d%*s+%*s%d%*s+%*s%d: ", a, n, "", n, "", b, n, "", n, "", c);
+      break;
+    case 1 :
+      printf("%d%*s+%*s%d%*s-%*s%d: ", a, n, "", n, "", b, n, "", n, "", c);
+      break;
+    case 2:
+      printf("%d%*s-%*s%d%*s+%*s%d: ", a, n, "", n, "", b, n, "", n, "", c);
+      break;
+    default :
+      printf("%d%*s-%*s%d%*s-%*s%d: ", a, n, "", n, "", b, n, "", n, "", c);
+    }
+    start = clock();              // 计时开始
+
+    do {
+      scanf("%d", &x);
+      if (x == a + b + c)
+        end = clock();              // 计时结束
+      break;
+      printf("\a回答错误。请重新输入：");
+    } while (1);
+    tm = (double)(end - start) / CLOCKS_PER_SEC;
+    printf("本题用时 %.1f 秒\n", tm);
+    tm_sum += tm;
+  }
+  printf("总计用时 %.1f 秒，平均每道题用时 %.1f 秒\n", tm_sum, tm_sum / 10);
+
+  return 0;
+}
+#+end_src
