@@ -4056,9 +4056,11 @@ int main (void)
   for (i=max; i>0; i--) {
     putchar(' ');
     for (j=0; j<=10; j++) {
-      if (i == bunpu[j]){
+      // if (i == bunpu[j]){
+      //   printf("*   ");
+      //   bunpu[j]--;
+      if (i <= bunpu[j]){
         printf("*   ");
-        bunpu[j]--;
       } else {
         printf("    ");
       }
